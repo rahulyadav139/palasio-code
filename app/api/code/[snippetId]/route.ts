@@ -6,13 +6,18 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { snippetId: string } }
 ) {
+  if (req.method !== 'GET') {
+    return NextResponse.json(
+      {
+        success: false,
+        message: `${req.method} method is not allowed`,
+      },
+      { status: 405 }
+    );
+  }
   try {
     await mongoConnect();
 
-    // req.nextUrl.searchParams.
-    // const url = new URL(req.url);
-    // url.searchParams
-    // console.log(params.snippetId, 'test');
     const snippet = await Snippet.findOne({ uid: params.snippetId });
 
     if (!snippet) {
@@ -22,7 +27,6 @@ export async function GET(
     return NextResponse.json({
       success: true,
       message: 'snippet fetched successfully!',
-      //   data: '',
       snippet,
     });
   } catch (err) {
@@ -32,5 +36,50 @@ export async function GET(
       success: false,
       message: 'internal server error',
     });
+  }
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { snippetId: string } }
+) {
+  if (req.method !== 'PATCH') {
+    return NextResponse.json(
+      {
+        success: false,
+        message: `${req.method} method is not allowed`,
+      },
+      { status: 405 }
+    );
+  }
+  try {
+    await mongoConnect();
+
+    const payload = await req.json();
+
+    await Snippet.findOneAndUpdate(
+      { uid: params.snippetId },
+      {
+        data: payload.data,
+      }
+    );
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'snippet updated successfully!',
+      },
+      { status: 200 }
+    );
+  } catch (err) {
+    console.log(err);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'internal server error',
+      },
+      { status: 500 }
+    );
   }
 }

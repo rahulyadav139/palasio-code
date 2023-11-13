@@ -28,6 +28,8 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
   const [saveData, setSaveData] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isModal, setIsModal] = useState(!snippet);
+  const [snippetId, setSnippetId] = useState<string | null>(null);
+
   const [snippetInfo, setSnippetInfo] = useState<ISnippetInfo>({
     name: snippet?.name ?? '',
     language: snippet?.language ?? 'text',
@@ -38,29 +40,38 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
     async (data: string) => {
       try {
         setIsLoading(true);
-        const [uid] = window.crypto.randomUUID().split('-');
-        const payload: Record<string, string> = {
-          data,
-          uid,
-          ...snippetInfo,
-        };
 
-        const res = await fetch('/api/code', {
-          method: 'POST',
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error('something went wrong');
+        if (!snippetId) {
+          const [uid] = window.crypto.randomUUID().split('-');
+          setSnippetId(uid);
+          const payload: Record<string, string> = {
+            data,
+            uid,
+            ...snippetInfo,
+          };
 
-        await res.json();
+          const res = await fetch('/api/code', {
+            method: 'POST',
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) throw new Error('something went wrong');
 
-        window.history.replaceState(null, 'Page', `/code/${uid}`);
+          window.history.replaceState(null, 'Page', `/code/${uid}`);
+        } else {
+          const res = await fetch(`/api/code/${snippetId}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ data }),
+          });
+          if (!res.ok) throw new Error('something went wrong');
+        }
       } catch (err) {
         console.log(err);
       } finally {
         setIsLoading(false);
+        setSaveData(false);
       }
     },
-    [snippetInfo]
+    [snippetInfo, snippetId]
   );
 
   return (
