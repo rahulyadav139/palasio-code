@@ -109,15 +109,24 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
           <>
             {!editSnippetName ? (
               <Stack direction="row" gap={1} alignItems="center">
-                <Typography>{snippetInfo.name}</Typography>
                 {!Boolean(snippet) && (
                   <IconButton
-                    size="small"
                     onClick={() => setEditSnippetName(true)}
+                    sx={{
+                      color: 'white',
+                      '&.Mui-disabled': {
+                        color: 'white',
+                        opacity: 0.7,
+                      },
+                      '&:hover': {
+                        background: '#292C33',
+                      },
+                    }}
                   >
-                    <Edit sx={{ color: 'white', fontSize: '1rem' }} />
+                    <Edit sx={{ fontSize: '1rem' }} />
                   </IconButton>
                 )}
+                <Typography>{snippetInfo.name}</Typography>
               </Stack>
             ) : (
               <input
