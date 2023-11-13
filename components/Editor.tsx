@@ -3,7 +3,7 @@
 import { Box } from '@mui/material';
 import React, { useState, FC, useCallback, useEffect, useMemo } from 'react';
 import { basicSetup } from 'codemirror';
-import { EditorView, keymap } from '@codemirror/view';
+import { EditorView, keymap, placeholder } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { indentWithTab } from '@codemirror/commands';
 import { oneDark } from '@codemirror/theme-one-dark';
@@ -54,6 +54,7 @@ export const Editor: FC<IEditor> = ({
         keymap.of([indentWithTab]),
         oneDark,
         EditorView.editable.of(!readonly),
+        placeholder('> Start typing here...'),
       ];
 
       if (language !== 'text') {
