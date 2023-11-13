@@ -14,9 +14,6 @@ export async function GET(req: Request) {
 
     const token = req.headers.get('authorization');
 
-    console.log(token);
-    console.log(token !== `Bearer ${process.env.CRON_SECRET}`);
-
     if (token !== `Bearer ${process.env.CRON_SECRET!}`) {
       return NextResponse.json(
         {
