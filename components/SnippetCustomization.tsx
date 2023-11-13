@@ -53,7 +53,7 @@ export const SnippetCustomization: FC<ISnippetCustomization> = ({
           left: '50%',
           transform: 'translateX(-50%) translateY(-50%)',
           // height: 200,
-          width: 600,
+          width: 'min(600px, 90%)',
           background: 'white',
           borderRadius: '10px',
           p: 2,
