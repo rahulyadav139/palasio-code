@@ -12,7 +12,10 @@ export async function GET(req: Request) {
   try {
     await mongoConnect();
 
-    const token = req.headers.get('Authorization');
+    const token = req.headers.get('authorization');
+
+    console.log(token);
+    console.log(token !== `Bearer ${process.env.CRON_SECRET}`);
 
     if (token !== `Bearer ${process.env.CRON_SECRET!}`) {
       return NextResponse.json(
@@ -26,7 +29,7 @@ export async function GET(req: Request) {
       );
     }
 
-    const res = await Snippet.deleteMany({ author: { $exists: 0 } });
+    await Snippet.deleteMany({ author: { $exists: 0 } });
 
     return NextResponse.json(
       {
