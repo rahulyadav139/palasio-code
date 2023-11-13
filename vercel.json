@@ -1,0 +1,8 @@
+{
+  "crone": [
+    {
+      "path": "/api/code/delete",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
