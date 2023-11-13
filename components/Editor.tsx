@@ -78,7 +78,7 @@ export const Editor: FC<IEditor> = ({
 
       setEditor(view);
     },
-    [language]
+    [language, doc, readonly, language]
   );
 
   useEffect(() => {
@@ -87,5 +87,11 @@ export const Editor: FC<IEditor> = ({
     }
   }, [saveData, saveDataHandler]);
 
-  return <Box component="div" ref={editorContainer} />;
+  return (
+    <Box
+      sx={{ flex: '1 1 auto', p: 1 }}
+      component="div"
+      ref={editorContainer}
+    />
+  );
 };

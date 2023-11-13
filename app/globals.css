@@ -8,3 +8,22 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+.cm-editor {
+  height: 100%;
+  border: none;
+  outline: none;
+}
+.cm-editor.cm-focused {
+  border: none;
+  outline: none;
+}
+
+.cm-scroller {
+  position: absolute !important;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+}

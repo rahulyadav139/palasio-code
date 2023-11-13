@@ -1,7 +1,7 @@
 'use client';
 import { Editor } from '@/components/Editor';
 import { useTimeout } from '@/hooks';
-import { Save, Share } from '@mui/icons-material';
+import { Add, Save, Share } from '@mui/icons-material';
 import {
   Box,
   IconButton,
@@ -14,6 +14,7 @@ import React, { FC, useCallback } from 'react';
 import { SnippetCustomization } from './SnippetCustomization';
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 interface ISnippet {
   snippet: any;
@@ -29,12 +30,12 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isModal, setIsModal] = useState(!snippet);
   const [snippetId, setSnippetId] = useState<string | null>(null);
+  const [timer, setTimer] = useTimeout(2);
 
   const [snippetInfo, setSnippetInfo] = useState<ISnippetInfo>({
     name: snippet?.name ?? '',
     language: snippet?.language ?? 'text',
   });
-  const [timer, setTimer] = useTimeout(2);
 
   const saveSnippetHandler: any = useCallback(
     async (data: string) => {
@@ -77,8 +78,10 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
   return (
     <Box
       sx={{
-        height: '100vh',
+        height: '100dvh',
         background: '#292C33',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <Box
@@ -89,7 +92,6 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
           p: 1,
           background: 'black',
           color: 'white',
-          minHeight: '55px',
         }}
       >
         <Stack direction="row" gap={1} alignItems="center">
@@ -100,7 +102,7 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
         </Stack>
 
         <Stack direction="row" gap={1} alignItems="center" ml="auto">
-          {!Boolean(snippet) && (
+          {!Boolean(snippet) ? (
             <>
               {!isLoading ? (
                 <IconButton onClick={() => setSaveData(true)}>
@@ -110,6 +112,12 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
                 <CircularProgress size={20} />
               )}
             </>
+          ) : (
+            <Link href="/code">
+              <IconButton>
+                <Add sx={{ color: 'white' }} />
+              </IconButton>
+            </Link>
           )}
           <Tooltip
             title="Link copied!"
