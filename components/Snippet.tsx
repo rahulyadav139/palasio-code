@@ -1,7 +1,7 @@
 'use client';
 import { Editor } from '@/components/Editor';
 import { useTimeout } from '@/hooks';
-import { Add, Save, Share } from '@mui/icons-material';
+import { Add, Edit, Save, Share } from '@mui/icons-material';
 import {
   Box,
   IconButton,
@@ -10,7 +10,7 @@ import {
   CircularProgress,
   Tooltip,
 } from '@mui/material';
-import React, { FC, useCallback } from 'react';
+import React, { FC, useCallback, useEffect, useRef } from 'react';
 import { SnippetCustomization } from './SnippetCustomization';
 
 import { useState } from 'react';
@@ -31,11 +31,15 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
   const [isModal, setIsModal] = useState(!snippet);
   const [snippetId, setSnippetId] = useState<string | null>(null);
   const [timer, setTimer] = useTimeout(2);
+  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [editSnippetName, setEditSnippetName] = useState<boolean>(false);
 
   const [snippetInfo, setSnippetInfo] = useState<ISnippetInfo>({
     name: snippet?.name ?? '',
     language: snippet?.language ?? 'text',
   });
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const saveSnippetHandler: any = useCallback(
     async (data: string) => {
@@ -58,6 +62,7 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
           if (!res.ok) throw new Error('something went wrong');
 
           window.history.replaceState(null, 'Page', `/code/${uid}`);
+          setIsSaved(true);
         } else {
           const res = await fetch(`/api/code/${snippetId}`, {
             method: 'PATCH',
@@ -74,6 +79,12 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
     },
     [snippetInfo, snippetId]
   );
+
+  useEffect(() => {
+    if (!editSnippetName) return;
+
+    inputRef.current?.focus();
+  }, [editSnippetName]);
 
   return (
     <Box
@@ -94,18 +105,64 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
           color: 'white',
         }}
       >
-        <Stack direction="row" gap={1} alignItems="center">
-          <Typography>{snippetInfo.name}</Typography>
-          {/* <IconButton size="small">
-            <Edit fontSize="small" sx={{ color: 'white' }} />
-          </IconButton> */}
-        </Stack>
+        {Boolean(snippetInfo.name) && (
+          <>
+            {!editSnippetName ? (
+              <Stack direction="row" gap={1} alignItems="center">
+                <Typography>{snippetInfo.name}</Typography>
+                {!Boolean(snippet) && (
+                  <IconButton
+                    size="small"
+                    onClick={() => setEditSnippetName(true)}
+                  >
+                    <Edit sx={{ color: 'white', fontSize: '1rem' }} />
+                  </IconButton>
+                )}
+              </Stack>
+            ) : (
+              <input
+                ref={inputRef}
+                defaultValue={snippetInfo.name}
+                onBlur={() => {
+                  setEditSnippetName(false);
+                  if (!inputRef.current?.value) return;
+
+                  setSnippetInfo(prev => ({
+                    ...prev,
+                    name: inputRef.current?.value!,
+                  }));
+                }}
+                style={{
+                  color: 'white',
+                  background: 'transparent',
+                  outline: 'none',
+                  border: 'none',
+                  borderBottom: '1px solid white',
+                  paddingBottom: '5px',
+                  width: 200,
+                }}
+              />
+            )}
+          </>
+        )}
 
         <Stack direction="row" gap={1} alignItems="center" ml="auto">
           {!Boolean(snippet) ? (
             <>
               {!isLoading ? (
-                <IconButton onClick={() => setSaveData(true)}>
+                <IconButton
+                  sx={{
+                    color: 'white',
+                    '&.Mui-disabled': {
+                      color: 'white',
+                      opacity: 0.7,
+                    },
+                    '&:hover': {
+                      background: '#292C33',
+                    },
+                  }}
+                  onClick={() => setSaveData(true)}
+                >
                   <Save fontSize="small" sx={{ color: 'white' }} />
                 </IconButton>
               ) : (
@@ -132,8 +189,19 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
                 setTimer(true);
                 navigator.clipboard.writeText(window.location.href);
               }}
+              disabled={!isSaved}
+              sx={{
+                color: 'white',
+                '&.Mui-disabled': {
+                  color: 'white',
+                  opacity: 0.7,
+                },
+                '&:hover': {
+                  background: '#292C33',
+                },
+              }}
             >
-              <Share fontSize="small" sx={{ color: 'white' }} />
+              <Share sx={{ fontSize: '1.2rem' }} />
             </IconButton>
           </Tooltip>
         </Stack>
