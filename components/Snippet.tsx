@@ -198,7 +198,7 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
                 setTimer(true);
                 navigator.clipboard.writeText(window.location.href);
               }}
-              disabled={!isSaved}
+              disabled={!isSaved && !Boolean(snippet)}
               sx={{
                 color: 'white',
                 '&.Mui-disabled': {
