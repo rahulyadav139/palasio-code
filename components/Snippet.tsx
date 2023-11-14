@@ -1,7 +1,7 @@
 'use client';
 import { Editor } from '@/components/Editor';
 import { useTimeout } from '@/hooks';
-import { Add, Edit, Save, Share } from '@mui/icons-material';
+import { Add, Close, Edit, Save, Share } from '@mui/icons-material';
 import {
   Box,
   IconButton,
@@ -11,6 +11,8 @@ import {
   Tooltip,
   Select,
   MenuItem,
+  Collapse,
+  Alert,
 } from '@mui/material';
 import React, {
   FC,
@@ -37,8 +39,8 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
   const [saveData, setSaveData] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [snippetId, setSnippetId] = useState<string | null>(null);
-  const [timer, setTimer] = useTimeout(2);
-  const [isSaved, setIsSaved] = useState<boolean>(false);
+  const [isShareTooltip, setIsShareTooltip] = useTimeout(2);
+  const [isAlert, setIsAlert] = useTimeout(8);
   const [editSnippetName, setEditSnippetName] = useState<boolean>(false);
 
   const [snippetInfo, setSnippetInfo] = useState<ISnippetInfo>({
@@ -68,17 +70,17 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
             ...snippetInfo,
           };
 
-          const res = await fetch('/api/code', {
+          const res = await fetch('/api/snippet', {
             method: 'POST',
             body: JSON.stringify(payload),
           });
           if (!res.ok) throw new Error('something went wrong');
 
-          window.history.replaceState(null, 'Page', `/code/${uid}`);
-          setIsSaved(true);
+          window.history.replaceState(null, 'Page', `/snippet/${uid}`);
           setSnippetId(uid);
+          setIsAlert(true);
         } else {
-          const res = await fetch(`/api/code/${snippetId}`, {
+          const res = await fetch(`/api/snippet/${snippetId}`, {
             method: 'PATCH',
             body: JSON.stringify({ data, ...snippetInfo }),
           });
@@ -109,6 +111,30 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
         flexDirection: 'column',
       }}
     >
+      <Collapse in={Boolean(isAlert)}>
+        <Alert
+          variant="filled"
+          severity="warning"
+          sx={{
+            borderRadius: 0,
+            p: 0,
+            px: 2,
+            fontSize: '0.8rem',
+          }}
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => setIsAlert(false)}
+            >
+              <Close fontSize="inherit" />
+            </IconButton>
+          }
+        >
+          This snippet will be deleted in a week!
+        </Alert>
+      </Collapse>
       <Box
         component="nav"
         sx={{
@@ -206,28 +232,32 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
                   </MenuItem>
                 ))}
               </Select>
-              {!isLoading ? (
-                <IconButton
-                  sx={{
-                    color: 'white',
-                    '&.Mui-disabled': {
+              <Box
+                sx={{ minWidth: 35, display: 'flex', justifyContent: 'center' }}
+              >
+                {!isLoading ? (
+                  <IconButton
+                    sx={{
                       color: 'white',
-                      opacity: 0.7,
-                    },
-                    '&:hover': {
-                      background: '#292C33',
-                    },
-                  }}
-                  onClick={() => setSaveData(true)}
-                >
-                  <Save fontSize="small" sx={{ color: 'white' }} />
-                </IconButton>
-              ) : (
-                <CircularProgress size={20} />
-              )}
+                      '&.Mui-disabled': {
+                        color: 'white',
+                        opacity: 0.7,
+                      },
+                      '&:hover': {
+                        background: '#292C33',
+                      },
+                    }}
+                    onClick={() => setSaveData(true)}
+                  >
+                    <Save fontSize="small" sx={{ color: 'white' }} />
+                  </IconButton>
+                ) : (
+                  <CircularProgress size={20} />
+                )}
+              </Box>
             </>
           ) : (
-            <Link href="/code">
+            <Link href="/snippet">
               <IconButton>
                 <Add sx={{ color: 'white' }} />
               </IconButton>
@@ -238,15 +268,15 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
             disableFocusListener
             disableHoverListener
             disableTouchListener
-            open={timer}
+            open={isShareTooltip}
             placement="bottom"
           >
             <IconButton
               onClick={() => {
-                setTimer(true);
+                setIsShareTooltip(true);
                 navigator.clipboard.writeText(window.location.href);
               }}
-              disabled={!isSaved && !Boolean(snippet)}
+              disabled={!snippetId && !Boolean(snippet)}
               sx={{
                 color: 'white',
                 '&.Mui-disabled': {

@@ -5,7 +5,7 @@ import { headers } from 'next/headers';
 
 const getData = async (host: string, id: string) => {
   try {
-    const res = await fetch(`http://${host}/api/code/${id}/`);
+    const res = await fetch(`http://${host}/api/snippet/${id}/`);
 
     if (!res.ok) {
       throw new Error('something went wrong');
@@ -20,13 +20,13 @@ const getData = async (host: string, id: string) => {
   }
 };
 
-interface ICode {
+interface ISnippetPage {
   params: {
     snippetId?: string[];
   };
 }
 
-export default async function Code({ params }: ICode) {
+export default async function SnippetPage({ params }: ISnippetPage) {
   let initialData: any;
   const host = headers().get('host');
 
@@ -44,9 +44,5 @@ export default async function Code({ params }: ICode) {
     }
   }
 
-  return (
-    <Box>
-      <Snippet snippet={initialData} />
-    </Box>
-  );
+  return <Snippet snippet={initialData} />;
 }
