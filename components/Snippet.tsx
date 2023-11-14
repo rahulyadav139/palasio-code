@@ -49,9 +49,10 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useLayoutEffect(() => {
+    if (snippet) return;
     const [uid] = window.crypto.randomUUID().split('-');
     setSnippetInfo(prev => ({ ...prev, name: `snippet-${uid}` }));
-  }, []);
+  }, [snippet]);
 
   const saveSnippetHandler: any = useCallback(
     async (data: string) => {
@@ -60,7 +61,7 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
 
         if (!snippetId) {
           const [uid] = window.crypto.randomUUID().split('-');
-          setSnippetId(uid);
+
           const payload: Record<string, string> = {
             data,
             uid,
@@ -75,10 +76,11 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
 
           window.history.replaceState(null, 'Page', `/code/${uid}`);
           setIsSaved(true);
+          setSnippetId(uid);
         } else {
           const res = await fetch(`/api/code/${snippetId}`, {
             method: 'PATCH',
-            body: JSON.stringify({ data }),
+            body: JSON.stringify({ data, ...snippetInfo }),
           });
           if (!res.ok) throw new Error('something went wrong');
         }

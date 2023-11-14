@@ -81,17 +81,18 @@ export const Editor: FC<IEditor> = ({
   );
 
   useEffect(() => {
+    if (!editor) return;
     if (lang !== 'text') {
       const selectedLang = languages[lang];
-      editor?.dispatch({
+      editor.dispatch({
         effects: langHolder.reconfigure([selectedLang(), basicSetup]),
       });
     } else {
-      editor?.dispatch({
+      editor.dispatch({
         effects: langHolder.reconfigure([]),
       });
     }
-  }, [lang]);
+  }, [lang, editor]);
 
   useEffect(() => {
     if (saveData && saveDataHandler) {

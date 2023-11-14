@@ -61,6 +61,8 @@ export async function PATCH(
       { uid: params.snippetId },
       {
         data: payload.data,
+        name: payload.name,
+        language: payload.language,
       }
     );
 
