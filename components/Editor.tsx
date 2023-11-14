@@ -3,8 +3,9 @@
 import { Box } from '@mui/material';
 import React, { useState, FC, useCallback, useEffect, useMemo } from 'react';
 import { basicSetup } from 'codemirror';
-import { EditorView, keymap } from '@codemirror/view';
-import { EditorState } from '@codemirror/state';
+import { language } from '@codemirror/language';
+import { EditorView, keymap, placeholder } from '@codemirror/view';
+import { Compartment, EditorState } from '@codemirror/state';
 import { indentWithTab } from '@codemirror/commands';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { IEditor } from '@/types/IEditor';
@@ -19,6 +20,8 @@ import { markdown } from '@codemirror/lang-markdown';
 import { php } from '@codemirror/lang-php';
 import { java } from '@codemirror/lang-java';
 import { LanguageSupport } from '@codemirror/language';
+
+const langHolder = new Compartment();
 
 const languages: Record<string, () => LanguageSupport> = {
   cpp,
@@ -38,7 +41,7 @@ export const Editor: FC<IEditor> = ({
   readonly,
   saveData,
   saveDataHandler,
-  language,
+  language: lang,
 }) => {
   const [editor, setEditor] = useState<EditorView | null>(null);
 
@@ -54,13 +57,9 @@ export const Editor: FC<IEditor> = ({
         keymap.of([indentWithTab]),
         oneDark,
         EditorView.editable.of(!readonly),
+        placeholder('> Start typing here...'),
+        langHolder.of([]),
       ];
-
-      if (language !== 'text') {
-        const lang = languages[language];
-        extensions.push(lang());
-        extensions.push(basicSetup);
-      }
 
       const initialState = EditorState.create({
         doc,
@@ -78,8 +77,22 @@ export const Editor: FC<IEditor> = ({
 
       setEditor(view);
     },
-    [language, doc, readonly, language]
+    [doc, readonly]
   );
+
+  useEffect(() => {
+    if (!editor) return;
+    if (lang !== 'text') {
+      const selectedLang = languages[lang];
+      editor.dispatch({
+        effects: langHolder.reconfigure([selectedLang(), basicSetup]),
+      });
+    } else {
+      editor.dispatch({
+        effects: langHolder.reconfigure([]),
+      });
+    }
+  }, [lang, editor]);
 
   useEffect(() => {
     if (saveData && saveDataHandler) {

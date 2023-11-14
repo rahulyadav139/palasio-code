@@ -26,7 +26,12 @@ export async function GET(req: Request) {
       );
     }
 
-    await Snippet.deleteMany({ author: { $exists: 0 } });
+    const today = new Date();
+
+    await Snippet.deleteMany({
+      author: { $exists: 0 },
+      created_at: { $lt: new Date(today.setDate(today.getDate() - 7)) },
+    });
 
     return NextResponse.json(
       {
