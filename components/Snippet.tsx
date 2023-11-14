@@ -9,9 +9,17 @@ import {
   Typography,
   CircularProgress,
   Tooltip,
+  Select,
+  MenuItem,
 } from '@mui/material';
-import React, { FC, useCallback, useEffect, useRef } from 'react';
-import { SnippetCustomization } from './SnippetCustomization';
+import React, {
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+} from 'react';
+import langOptions from '@/asset/languageOptions.json';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -28,7 +36,6 @@ export interface ISnippetInfo {
 export const Snippet: FC<ISnippet> = ({ snippet }) => {
   const [saveData, setSaveData] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isModal, setIsModal] = useState(!snippet);
   const [snippetId, setSnippetId] = useState<string | null>(null);
   const [timer, setTimer] = useTimeout(2);
   const [isSaved, setIsSaved] = useState<boolean>(false);
@@ -40,6 +47,11 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
   });
 
   const inputRef = useRef<HTMLInputElement | null>(null);
+
+  useLayoutEffect(() => {
+    const [uid] = window.crypto.randomUUID().split('-');
+    setSnippetInfo(prev => ({ ...prev, name: `snippet-${uid}` }));
+  }, []);
 
   const saveSnippetHandler: any = useCallback(
     async (data: string) => {
@@ -158,6 +170,40 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
         <Stack direction="row" gap={1} alignItems="center" ml="auto">
           {!Boolean(snippet) ? (
             <>
+              <Select
+                value={snippetInfo.language}
+                onChange={e =>
+                  setSnippetInfo(prev => ({
+                    ...prev,
+                    language: e.target.value,
+                  }))
+                }
+                size="small"
+                sx={{
+                  background: '#292C33',
+                  color: 'white',
+                  minWidth: 100,
+                  fontSize: '0.7rem',
+                  '& .MuiPaper-root': {
+                    minWidth: 100,
+                  },
+                  '& .MuiSelect-icon': {
+                    color: 'white',
+                  },
+                }}
+              >
+                {langOptions.map(el => (
+                  <MenuItem
+                    sx={{
+                      fontSize: '0.8rem',
+                    }}
+                    key={el.value}
+                    value={el.value}
+                  >
+                    {el.label}
+                  </MenuItem>
+                ))}
+              </Select>
               {!isLoading ? (
                 <IconButton
                   sx={{
@@ -222,14 +268,6 @@ export const Snippet: FC<ISnippet> = ({ snippet }) => {
         language={snippetInfo.language}
         saveDataHandler={saveSnippetHandler}
       />
-
-      {isModal && (
-        <SnippetCustomization
-          setSnippetInfo={setSnippetInfo}
-          open={isModal}
-          onClose={() => setIsModal(false)}
-        />
-      )}
     </Box>
   );
 };
