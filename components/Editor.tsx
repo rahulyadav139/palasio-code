@@ -1,11 +1,16 @@
 'use client';
 
 import { Box } from '@mui/material';
-import React, { useState, FC, useCallback, useEffect, useMemo } from 'react';
-import { basicSetup } from 'codemirror';
+import React, { useState, FC, useCallback, useEffect } from 'react';
+import { basicSetup, minimalSetup } from 'codemirror';
 import { language } from '@codemirror/language';
-import { EditorView, keymap, placeholder } from '@codemirror/view';
-import { Compartment, EditorState } from '@codemirror/state';
+import { EditorView, keymap, lineNumbers, placeholder } from '@codemirror/view';
+import {
+  Compartment,
+  EditorSelection,
+  EditorState,
+  Extension,
+} from '@codemirror/state';
 import { indentWithTab } from '@codemirror/commands';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { IEditor } from '@/types/IEditor';
@@ -21,7 +26,7 @@ import { php } from '@codemirror/lang-php';
 import { java } from '@codemirror/lang-java';
 import { LanguageSupport } from '@codemirror/language';
 
-const langHolder = new Compartment();
+const extHolder = new Compartment();
 
 const languages: Record<string, () => LanguageSupport> = {
   cpp,
@@ -57,8 +62,9 @@ export const Editor: FC<IEditor> = ({
         keymap.of([indentWithTab]),
         oneDark,
         EditorView.editable.of(!readonly),
+        EditorState.readOnly.of(!!readonly),
         placeholder('> Start typing here...'),
-        langHolder.of([]),
+        extHolder.of([]),
       ];
 
       const initialState = EditorState.create({
@@ -74,7 +80,6 @@ export const Editor: FC<IEditor> = ({
       if (!readonly) {
         view.focus();
       }
-
       setEditor(view);
     },
     [doc, readonly]
@@ -82,17 +87,24 @@ export const Editor: FC<IEditor> = ({
 
   useEffect(() => {
     if (!editor) return;
+
+    const extensions: Extension[] = [];
     if (lang !== 'text') {
       const selectedLang = languages[lang];
-      editor.dispatch({
-        effects: langHolder.reconfigure([selectedLang(), basicSetup]),
-      });
-    } else {
-      editor.dispatch({
-        effects: langHolder.reconfigure([]),
-      });
+      extensions.push(selectedLang());
+
+      if (!readonly) {
+        extensions.push(basicSetup);
+      } else {
+        extensions.push(minimalSetup);
+        extensions.push(lineNumbers());
+      }
     }
-  }, [lang, editor]);
+
+    editor.dispatch({
+      effects: extHolder.reconfigure(extensions),
+    });
+  }, [lang, editor, readonly]);
 
   useEffect(() => {
     if (saveData && saveDataHandler) {
