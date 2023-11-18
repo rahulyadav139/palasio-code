@@ -1,4 +1,3 @@
-import { Box } from '@mui/material';
 import { Snippet } from '@/components/Snippet';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
@@ -22,7 +21,7 @@ const getData = async (host: string, id: string) => {
 
 interface ISnippetPage {
   params: {
-    snippetId?: string[];
+    snippetId: string;
   };
 }
 
@@ -30,19 +29,14 @@ export default async function SnippetPage({ params }: ISnippetPage) {
   let initialData: any;
   const host = headers().get('host');
 
-  if (params.snippetId && params.snippetId.length > 1) {
-    redirect('/code');
-  } else if (params.snippetId) {
-    const id = params.snippetId[0];
+  const id = params.snippetId;
 
-    const { snippet, error } = await getData(host!, id);
+  const { snippet, error } = await getData(host!, id);
 
-    if (error || !snippet) {
-      redirect('/');
-    } else {
-      initialData = snippet;
-    }
+  if (error || !snippet) {
+    redirect('/');
   }
+  initialData = snippet;
 
   return <Snippet snippet={initialData} />;
 }

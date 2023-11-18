@@ -1,5 +1,5 @@
 export interface IEditor {
-  doc?: string;
+  doc: string;
   readonly?: boolean;
   saveData?: boolean;
   saveDataHandler?: (string) => void;

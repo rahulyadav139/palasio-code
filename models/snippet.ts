@@ -1,6 +1,7 @@
+import { ISnippet } from '@/schema/snippet';
 import mongoose from 'mongoose';
 
-const snippetSchema = new mongoose.Schema(
+const snippetSchema = new mongoose.Schema<ISnippet>(
   {
     uid: { type: String, unique: true },
     data: String,
