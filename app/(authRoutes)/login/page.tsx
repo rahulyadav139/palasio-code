@@ -11,6 +11,7 @@ import { ChangeEvent, FormEventHandler, useState } from 'react';
 import { regex } from '@/utils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { LoadingButton } from '@mui/lab';
 
 interface IFormData {
   email: string;
@@ -24,6 +25,7 @@ export default function Register() {
     password: '',
   });
   const [isFormValid, setIsFormValid] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const loginHandler: FormEventHandler = async e => {
     e.preventDefault();
 
@@ -32,10 +34,12 @@ export default function Register() {
     else setIsFormValid(true);
 
     try {
-      const { data } = await axios.post('/api/auth/login', formData);
+      setIsLoading(true);
+      await axios.post('/api/auth/login', formData);
       router.replace('/home');
     } catch (err) {
       console.log(err);
+      setIsLoading(false);
     }
   };
 
@@ -110,7 +114,8 @@ export default function Register() {
           error={!isFormValid && !formData.password}
         />
 
-        <Button
+        <LoadingButton
+          loading={isLoading}
           type="submit"
           sx={{ mt: 3 }}
           disableElevation
@@ -118,7 +123,7 @@ export default function Register() {
           variant="contained"
         >
           Submit
-        </Button>
+        </LoadingButton>
       </Box>
     </Box>
   );
