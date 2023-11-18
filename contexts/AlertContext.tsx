@@ -25,10 +25,10 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
       setAlertState({ type: 'error', message });
     },
     setSuccess(message: string) {
-      setAlertState({ type: 'error', message });
+      setAlertState({ type: 'success', message });
     },
     setWarning(message: string) {
-      setAlertState({ type: 'error', message });
+      setAlertState({ type: 'warning', message });
     },
   };
 
