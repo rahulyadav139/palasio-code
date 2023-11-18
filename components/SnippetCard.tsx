@@ -1,4 +1,6 @@
 'use client';
+import { useAlert } from '@/hooks/useAlert';
+import { useError } from '@/hooks/useError';
 import { Delete } from '@mui/icons-material';
 import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import axios from 'axios';
@@ -8,7 +10,9 @@ import { FC, useState, SyntheticEvent } from 'react';
 
 export const SnippetCard: FC<any> = ({ snippet, updateSnippets }) => {
   const router = useRouter();
+  const { setError, setSuccess } = useAlert();
   const [isLoading, setIsLoading] = useState(false);
+  const { errorHandler } = useError();
   const deleteSnippetHandler = async (e: SyntheticEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
@@ -18,8 +22,9 @@ export const SnippetCard: FC<any> = ({ snippet, updateSnippets }) => {
       await axios.delete(`/api/user/snippets/${snippet._id}`);
 
       await updateSnippets();
+      setSuccess('Snippet deleted!');
     } catch (err) {
-      console.log(err);
+      errorHandler(err);
     } finally {
       setIsLoading(false);
     }

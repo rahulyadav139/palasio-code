@@ -25,6 +25,7 @@ import { Editor } from '@/components/Editor';
 import langOptions from '@/assets/languageOptions.json';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { useError } from '@/hooks/useError';
 
 export interface ISnippetInfo {
   name: string;
@@ -48,6 +49,7 @@ export default function CreateSnippet() {
   const [isSavedSnippet, setIsSavedSnippet] = useState<boolean>(false);
   const { user } = useUser();
   const router = useRouter();
+  const { errorHandler } = useError();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -80,19 +82,15 @@ export default function CreateSnippet() {
           setIsSavedSnippet(true);
           setIsAlert(true);
         } else {
-          const payload = {
+          const payload: Record<string, string> = {
             data,
             ...snippetInfo,
           };
 
-          // if()
-          await axios.patch(`/api/snippet/${snippetId}`, {
-            data,
-            ...snippetInfo,
-          });
+          await axios.patch(`/api/snippet/${snippetId}`, payload);
         }
       } catch (err) {
-        console.log(err);
+        errorHandler(err);
       } finally {
         setIsLoading(false);
         setSaveData(false);

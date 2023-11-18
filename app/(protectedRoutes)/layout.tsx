@@ -7,9 +7,13 @@ import { useRouter } from 'next/navigation';
 import { Typography } from '@mui/material';
 import { Header } from '@/components';
 import { useUser } from '@/hooks';
+import { useAlert } from '@/hooks/useAlert';
+import { useError } from '@/hooks/useError';
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const { user, setUser } = useUser();
+  const { setAlert, setSuccess } = useAlert();
+  const { errorHandler } = useError();
   const router = useRouter();
 
   useEffect(() => {
@@ -20,15 +24,15 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
 
         setUser(data.user);
       } catch (err) {
-        console.log(err);
+        if (axios.isAxiosError(err) && err.response?.status === 401) {
+          setSuccess('User logout');
 
-        if (axios.isAxiosError(err)) {
-          const status = err.response?.status;
+          router.push('/login');
 
-          if (status === 401) {
-            router.push('/login');
-          }
+          return;
         }
+
+        errorHandler(err);
       }
     })();
   }, [user]);

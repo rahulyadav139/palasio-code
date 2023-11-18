@@ -1,6 +1,7 @@
 import { Snippet } from '@/components/Snippet';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
+import { ISnippet } from '@/types/ISnippet';
 
 const getData = async (host: string, id: string) => {
   try {
@@ -26,7 +27,7 @@ interface ISnippetPage {
 }
 
 export default async function SnippetPage({ params }: ISnippetPage) {
-  let initialData: any;
+  let initialData: ISnippet;
   const host = headers().get('host');
 
   const id = params.snippetId;

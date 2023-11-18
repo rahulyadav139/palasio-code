@@ -5,11 +5,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { SnippetCard } from './SnippetCard';
 import axios from 'axios';
 import { ISnippet } from '@/types/ISnippet';
+import { useError } from '@/hooks/useError';
 
 export const UserSnippets = () => {
   const [snippets, setSnippets] = useState<ISnippet[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [enableReload, setEnableReload] = useState<boolean>(false);
+  const { errorHandler } = useError();
 
   const updateSnippetsHandler = useCallback(async () => {
     const { data } = await axios.get('/api/user/snippets');
@@ -23,7 +25,7 @@ export const UserSnippets = () => {
       try {
         await updateSnippetsHandler();
       } catch (err) {
-        console.log(err);
+        errorHandler(err);
         setEnableReload(true);
       } finally {
         setIsLoading(false);

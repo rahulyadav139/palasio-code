@@ -5,13 +5,15 @@ import { Add, Share, Home } from '@mui/icons-material';
 import { Box, IconButton, Stack, Typography, Tooltip } from '@mui/material';
 import React, { FC } from 'react';
 import Link from 'next/link';
+import { ISnippet } from '@/types/ISnippet';
+
 import { useRouter } from 'next/navigation';
 
-interface ISnippet {
-  snippet: any;
+interface SnippetType {
+  snippet: ISnippet;
 }
 
-export const Snippet: FC<ISnippet> = ({ snippet }) => {
+export const Snippet: FC<SnippetType> = ({ snippet }) => {
   const [isShareTooltip, setIsShareTooltip] = useTimeout(2);
   const router = useRouter();
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useUser } from '@/hooks';
+import { useError } from '@/hooks/useError';
 import { Add } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Box, IconButton, Typography } from '@mui/material';
@@ -12,6 +13,7 @@ export const Header = () => {
   const { user, setUser } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { errorHandler } = useError();
 
   const userLogoutHandler = async () => {
     try {
@@ -20,7 +22,7 @@ export const Header = () => {
       setUser(null);
       router.push('/login');
     } catch (err) {
-      console.log(err);
+      errorHandler(err);
     } finally {
       setIsLoading(false);
     }

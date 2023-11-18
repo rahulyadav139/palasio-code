@@ -13,6 +13,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { LoadingButton } from '@mui/lab';
 import { useAlert } from '@/hooks/useAlert';
+import { useError } from '@/hooks/useError';
 
 interface IFormData {
   email: string;
@@ -21,7 +22,7 @@ interface IFormData {
 
 export default function Register() {
   const router = useRouter();
-  const { setAlert } = useAlert();
+  const { errorHandler } = useError();
   const [formData, setFormData] = useState<IFormData>({
     email: '',
     password: '',
@@ -47,13 +48,9 @@ export default function Register() {
 
       if (axios.isAxiosError(err) && err.response?.status === 409) {
         errorMessage = 'Email is already registered!';
-      } else {
-        errorMessage = 'Internal server error';
       }
 
-      if (errorMessage) {
-        setAlert({ type: 'error', message: errorMessage });
-      }
+      errorHandler(err, errorMessage);
 
       setIsLoading(false);
     }
