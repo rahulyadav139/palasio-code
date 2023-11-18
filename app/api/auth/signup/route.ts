@@ -17,6 +17,15 @@ export async function POST(req: NextRequest) {
 
     const { salt, hash } = genPassword(password);
 
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return NextResponse.json(
+        { success: false, message: 'existing user' },
+        { status: 409 }
+      );
+    }
+
     const user = new User({ email, salt, hash });
 
     await user.save();

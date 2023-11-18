@@ -12,6 +12,7 @@ import { regex } from '@/utils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { LoadingButton } from '@mui/lab';
+import { useAlert } from '@/hooks/useAlert';
 
 interface IFormData {
   email: string;
@@ -20,6 +21,7 @@ interface IFormData {
 
 export default function Register() {
   const router = useRouter();
+  const { setAlert } = useAlert();
   const [formData, setFormData] = useState<IFormData>({
     email: '',
     password: '',
@@ -41,7 +43,18 @@ export default function Register() {
       await axios.post('/api/auth/signup', formData);
       router.replace('/home');
     } catch (err) {
-      console.log(err);
+      let errorMessage: string | undefined;
+
+      if (axios.isAxiosError(err) && err.response?.status === 409) {
+        errorMessage = 'Email is already registered!';
+      } else {
+        errorMessage = 'Internal server error';
+      }
+
+      if (errorMessage) {
+        setAlert({ type: 'error', message: errorMessage });
+      }
+
       setIsLoading(false);
     }
   };

@@ -12,6 +12,7 @@ import { regex } from '@/utils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { LoadingButton } from '@mui/lab';
+import { useAlert } from '@/hooks/useAlert';
 
 interface IFormData {
   email: string;
@@ -19,6 +20,7 @@ interface IFormData {
 }
 
 export default function Register() {
+  const { setAlert } = useAlert();
   const router = useRouter();
   const [formData, setFormData] = useState<IFormData>({
     email: '',
@@ -35,10 +37,23 @@ export default function Register() {
 
     try {
       setIsLoading(true);
-      await axios.post('/api/auth/login', formData);
+      await axios.post('/api/auth/login', {
+        ...formData,
+        email: formData.email.toLowerCase(),
+      });
       router.replace('/home');
     } catch (err) {
-      console.log(err);
+      let errorMessage: string | undefined;
+
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        errorMessage = 'Incorrect username or password!';
+      } else {
+        errorMessage = 'Internal server error';
+      }
+
+      if (errorMessage) {
+        setAlert({ type: 'error', message: errorMessage });
+      }
       setIsLoading(false);
     }
   };
