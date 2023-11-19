@@ -1,31 +1,21 @@
 import axios, { AxiosError } from 'axios';
 import { useAlert } from './useAlert';
-import { useState } from 'react';
 
 export const useError = () => {
   const { setError } = useAlert();
-  const [statusCode, setStatusCode] = useState<number | null>(null);
 
   const errorHandler = (err: AxiosError | unknown, message?: string) => {
     let errorMessage: string | undefined;
 
-    if (axios.isAxiosError(err)) {
-      if (err.response) {
-        const status = err.response.status;
+    const status = getStatusCode(err);
 
-        setStatusCode(status);
-
-        if (status >= 500) {
-          errorMessage = 'Internal server error';
-        } else if (status === 400) {
-          errorMessage = 'Bad request';
-        }
-      } else {
-        setStatusCode(0);
-        errorMessage = 'Network error';
-      }
+    if (status >= 500) {
+      errorMessage = 'Internal server error';
+    } else if (status === 400) {
+      errorMessage = 'Bad request';
+    } else if (status === 0) {
+      errorMessage = 'Network error';
     } else {
-      setStatusCode(-1);
       errorMessage = 'Unexpected error';
     }
 
@@ -38,7 +28,20 @@ export const useError = () => {
     }
   };
 
-  const getStatusCode = () => statusCode;
+  const getStatusCode = (err: AxiosError | unknown) => {
+    let status: number | undefined;
+    if (axios.isAxiosError(err)) {
+      if (err.response) {
+        status = err.response.status;
+      } else {
+        status = 0;
+      }
+    } else {
+      status = -1;
+    }
+
+    return status;
+  };
 
   return { getStatusCode, errorHandler };
 };

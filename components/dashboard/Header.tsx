@@ -6,7 +6,7 @@ import { Add } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Box, IconButton, Typography } from '@mui/material';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export const Header = () => {
@@ -19,7 +19,7 @@ export const Header = () => {
     try {
       setIsLoading(true);
       await axios.delete('/api/auth/logout');
-      setUser(null);
+
       router.push('/login');
     } catch (err) {
       errorHandler(err);

@@ -7,13 +7,14 @@ import {
   Link as MuiLink,
 } from '@mui/material';
 import Link from 'next/link';
-import { ChangeEvent, FormEventHandler, useState } from 'react';
+import { ChangeEvent, FormEventHandler, useEffect, useState } from 'react';
 import { regex } from '@/utils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { LoadingButton } from '@mui/lab';
 import { useAlert } from '@/hooks/useAlert';
 import { useError } from '@/hooks/useError';
+import { useUser } from '@/hooks';
 
 interface IFormData {
   email: string;
@@ -21,8 +22,7 @@ interface IFormData {
 }
 
 export default function Register() {
-  const { setAlert } = useAlert();
-  const { errorHandler } = useError();
+  const { errorHandler, getStatusCode } = useError();
   const router = useRouter();
   const [formData, setFormData] = useState<IFormData>({
     email: '',
@@ -30,6 +30,7 @@ export default function Register() {
   });
   const [isFormValid, setIsFormValid] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { setUser, user } = useUser();
   const loginHandler: FormEventHandler = async e => {
     e.preventDefault();
 
@@ -47,7 +48,9 @@ export default function Register() {
     } catch (err) {
       let errorMessage: string | undefined;
 
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
+      const status = getStatusCode(err);
+
+      if (status === 401) {
         errorMessage = 'Incorrect username or password!';
       }
 
@@ -55,6 +58,12 @@ export default function Register() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      setUser(null);
+    }
+  }, [user]);
 
   const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

@@ -22,7 +22,7 @@ interface IFormData {
 
 export default function Register() {
   const router = useRouter();
-  const { errorHandler } = useError();
+  const { errorHandler, getStatusCode } = useError();
   const [formData, setFormData] = useState<IFormData>({
     email: '',
     password: '',
@@ -46,7 +46,9 @@ export default function Register() {
     } catch (err) {
       let errorMessage: string | undefined;
 
-      if (axios.isAxiosError(err) && err.response?.status === 409) {
+      const status = getStatusCode(err);
+
+      if (status === 409) {
         errorMessage = 'Email is already registered!';
       }
 
