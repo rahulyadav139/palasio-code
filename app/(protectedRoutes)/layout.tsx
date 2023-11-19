@@ -1,15 +1,15 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
-import { UserContext } from '@/contexts/UserContext';
+import { ReactNode, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Typography } from '@mui/material';
 import { Header } from '@/components';
-import { useUser } from '@/hooks';
+import { useUser, useError } from '@/hooks';
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const { user, setUser } = useUser();
+  const { errorHandler, getStatusCode } = useError();
   const router = useRouter();
 
   useEffect(() => {
@@ -20,15 +20,14 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
 
         setUser(data.user);
       } catch (err) {
-        console.log(err);
+        const status = getStatusCode(err);
+        if (status === 401) {
+          router.push('/login');
 
-        if (axios.isAxiosError(err)) {
-          const status = err.response?.status;
-
-          if (status === 401) {
-            router.push('/login');
-          }
+          return;
         }
+
+        errorHandler(err);
       }
     })();
   }, [user]);

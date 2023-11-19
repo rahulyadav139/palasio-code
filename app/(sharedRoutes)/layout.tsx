@@ -1,5 +1,5 @@
 'use client';
-import { useUser } from '@/hooks';
+import { useUser, useError } from '@/hooks';
 import { Typography } from '@mui/material';
 import axios from 'axios';
 import { ReactNode, useEffect, useState } from 'react';
@@ -10,6 +10,7 @@ export default function SharedRoutesLayout({
   children: ReactNode;
 }) {
   const { user, setUser } = useUser();
+  const { errorHandler } = useError();
   const [isLoading, setIsLoading] = useState<boolean>(!user);
 
   useEffect(() => {
@@ -21,7 +22,7 @@ export default function SharedRoutesLayout({
 
         setUser(data.user);
       } catch (err) {
-        console.log(err);
+        errorHandler(err);
       } finally {
         setIsLoading(false);
       }

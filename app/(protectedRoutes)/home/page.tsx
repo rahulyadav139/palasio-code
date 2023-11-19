@@ -1,4 +1,4 @@
-import { UserSnippets } from '@/components/UserSnippets';
+import { UserSnippets } from '@/components';
 import { Box, Divider, Typography } from '@mui/material';
 
 export default function Home() {

@@ -1,5 +1,5 @@
-import { mongoConnect } from '@/utils/mongoConnect';
-import { Snippet } from '@/models/snippet';
+import { mongoConnect } from '@/utils';
+import { Snippet } from '@/models';
 import { NextResponse } from 'next/server';
 
 export async function GET(req: Request) {

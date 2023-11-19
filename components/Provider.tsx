@@ -1,7 +1,8 @@
 'use client';
 
-import { UserProvider } from '@/contexts/UserContext';
+import { AlertProvider, UserProvider } from '@/contexts';
 import { FC, ReactNode } from 'react';
+import { Alert } from '@/components';
 
 interface IProvider {
   children: ReactNode;
@@ -10,7 +11,10 @@ interface IProvider {
 export const Provider: FC<IProvider> = ({ children }) => {
   return (
     <>
-      <UserProvider>{children}</UserProvider>
+      <AlertProvider>
+        <Alert />
+        <UserProvider>{children}</UserProvider>
+      </AlertProvider>
     </>
   );
 };

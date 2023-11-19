@@ -1,6 +1,8 @@
-import { Snippet } from '@/components/Snippet';
+import { Snippet } from '@/components';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
+import { ISnippet } from '@/types';
+import NotFound from '@/app/not-found';
 
 const getData = async (host: string, id: string) => {
   try {
@@ -26,14 +28,18 @@ interface ISnippetPage {
 }
 
 export default async function SnippetPage({ params }: ISnippetPage) {
-  let initialData: any;
+  let initialData: ISnippet;
   const host = headers().get('host');
 
   const id = params.snippetId;
 
   const { snippet, error } = await getData(host!, id);
 
-  if (error || !snippet) {
+  if (!snippet) {
+    return <NotFound />;
+  }
+
+  if (error) {
     redirect('/');
   }
   initialData = snippet;

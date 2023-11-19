@@ -1,9 +1,11 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 
 type useTimeoutReturn = [
   boolean,
   React.Dispatch<React.SetStateAction<boolean>>,
-  number,
+  number
 ];
 
 export const useTimeout = (time: number): useTimeoutReturn => {

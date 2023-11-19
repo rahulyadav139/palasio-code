@@ -1,6 +1,6 @@
 'use client';
 
-import { useUser } from '@/hooks';
+import { useUser, useError } from '@/hooks';
 import { Add } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Box, IconButton, Typography } from '@mui/material';
@@ -9,18 +9,19 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export const Header = () => {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { errorHandler } = useError();
 
   const userLogoutHandler = async () => {
     try {
       setIsLoading(true);
       await axios.delete('/api/auth/logout');
-      setUser(null);
+
       router.push('/login');
     } catch (err) {
-      console.log(err);
+      errorHandler(err);
     } finally {
       setIsLoading(false);
     }

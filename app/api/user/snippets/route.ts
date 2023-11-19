@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { mongoConnect } from '@/utils';
-import { Snippet } from '@/models/snippet';
+import { Snippet } from '@/models';
 
 export async function GET(req: NextRequest) {
   if (req.method !== 'GET') {

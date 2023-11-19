@@ -3,14 +3,16 @@ import {
   Box,
   TextField,
   Typography,
-  Button,
   Link as MuiLink,
 } from '@mui/material';
 import Link from 'next/link';
-import { ChangeEvent, FormEventHandler, useState } from 'react';
+import { ChangeEvent, FormEventHandler, useEffect, useState } from 'react';
 import { regex } from '@/utils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import { LoadingButton } from '@mui/lab';
+import { useError, useUser } from '@/hooks';
+
 
 interface IFormData {
   email: string;
@@ -18,12 +20,15 @@ interface IFormData {
 }
 
 export default function Register() {
+  const { errorHandler, getStatusCode } = useError();
   const router = useRouter();
   const [formData, setFormData] = useState<IFormData>({
     email: '',
     password: '',
   });
   const [isFormValid, setIsFormValid] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { setUser, user } = useUser();
   const loginHandler: FormEventHandler = async e => {
     e.preventDefault();
 
@@ -32,12 +37,31 @@ export default function Register() {
     else setIsFormValid(true);
 
     try {
-      const { data } = await axios.post('/api/auth/login', formData);
+      setIsLoading(true);
+      await axios.post('/api/auth/login', {
+        ...formData,
+        email: formData.email.toLowerCase(),
+      });
       router.replace('/home');
     } catch (err) {
-      console.log(err);
+      let errorMessage: string | undefined;
+
+      const status = getStatusCode(err);
+
+      if (status === 401) {
+        errorMessage = 'Incorrect username or password!';
+      }
+
+      errorHandler(err, errorMessage);
+      setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      setUser(null);
+    }
+  }, [user]);
 
   const inputHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -110,7 +134,8 @@ export default function Register() {
           error={!isFormValid && !formData.password}
         />
 
-        <Button
+        <LoadingButton
+          loading={isLoading}
           type="submit"
           sx={{ mt: 3 }}
           disableElevation
@@ -118,7 +143,7 @@ export default function Register() {
           variant="contained"
         >
           Submit
-        </Button>
+        </LoadingButton>
       </Box>
     </Box>
   );

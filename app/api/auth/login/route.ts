@@ -1,9 +1,6 @@
 import { User } from '@/models/user';
-import { mongoConnect } from '@/utils';
-import { isPasswordValid } from '@/utils/validator';
+import { mongoConnect, isPasswordValid, genToken } from '@/utils';
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { genToken } from '@/utils/genToken';
 
 export async function POST(req: NextRequest) {
   if (req.method !== 'POST') {

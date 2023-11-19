@@ -2,14 +2,16 @@
 
 import { Typography, Box, Button } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import { SnippetCard } from './SnippetCard';
+import { SnippetCard } from '@/components';
 import axios from 'axios';
-import { ISnippet } from '@/types/ISnippet';
+import { ISnippet } from '@/types';
+import { useError } from '@/hooks';
 
 export const UserSnippets = () => {
   const [snippets, setSnippets] = useState<ISnippet[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [enableReload, setEnableReload] = useState<boolean>(false);
+  const { errorHandler } = useError();
 
   const updateSnippetsHandler = useCallback(async () => {
     const { data } = await axios.get('/api/user/snippets');
@@ -23,7 +25,7 @@ export const UserSnippets = () => {
       try {
         await updateSnippetsHandler();
       } catch (err) {
-        console.log(err);
+        errorHandler(err);
         setEnableReload(true);
       } finally {
         setIsLoading(false);
