@@ -60,6 +60,7 @@ export default function CreateSnippet() {
 
   const saveSnippetHandler = useCallback(
     async (data: string) => {
+      if (!data || (data && !data.trim())) return;
       try {
         setIsLoading(true);
 
