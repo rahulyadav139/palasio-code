@@ -15,7 +15,7 @@ export const useError = () => {
       errorMessage = 'Bad request';
     } else if (status === 0) {
       errorMessage = 'Network error';
-    } else {
+    } else if (status === -1) {
       errorMessage = 'Unexpected error';
     }
 
