@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { mongoConnect } from '@/utils';
-import { User } from '@/models/user';
+import { User } from '@/models';
 import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 
 export async function GET(req: NextRequest) {

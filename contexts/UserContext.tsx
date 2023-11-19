@@ -1,10 +1,8 @@
+'use client';
+
 import { IUser } from '@/types/IUser';
 import React, { ReactNode, createContext, useState } from 'react';
-
-export interface IUserContext {
-  user: IUser | null;
-  setUser: React.Dispatch<React.SetStateAction<IUser | null>>;
-}
+import { IUserContext } from '@/types';
 
 export const UserContext = createContext<IUserContext | null>(null);
 

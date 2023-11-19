@@ -1,16 +1,21 @@
 'use client';
-import { useAlert } from '@/hooks/useAlert';
-import { useError } from '@/hooks/useError';
+
+import { useAlert, useError } from '@/hooks';
+import { ISnippet } from '@/types';
 import { Delete } from '@mui/icons-material';
 import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import axios from 'axios';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FC, useState, SyntheticEvent } from 'react';
 
-export const SnippetCard: FC<any> = ({ snippet, updateSnippets }) => {
+interface ISnippetCard {
+  snippet: ISnippet;
+  updateSnippets: () => Promise<void>;
+}
+
+export const SnippetCard: FC<ISnippetCard> = ({ snippet, updateSnippets }) => {
   const router = useRouter();
-  const { setError, setSuccess } = useAlert();
+  const { setSuccess } = useAlert();
   const [isLoading, setIsLoading] = useState(false);
   const { errorHandler } = useError();
   const deleteSnippetHandler = async (e: SyntheticEvent<HTMLButtonElement>) => {

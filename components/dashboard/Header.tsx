@@ -1,16 +1,15 @@
 'use client';
 
-import { useUser } from '@/hooks';
-import { useError } from '@/hooks/useError';
+import { useUser, useError } from '@/hooks';
 import { Add } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
 import { Box, IconButton, Typography } from '@mui/material';
 import axios from 'axios';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export const Header = () => {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { errorHandler } = useError();

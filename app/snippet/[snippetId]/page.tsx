@@ -1,7 +1,7 @@
-import { Snippet } from '@/components/Snippet';
+import { Snippet } from '@/components';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
-import { ISnippet } from '@/types/ISnippet';
+import { ISnippet } from '@/types';
 import NotFound from '@/app/not-found';
 
 const getData = async (host: string, id: string) => {

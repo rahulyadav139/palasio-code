@@ -3,7 +3,6 @@ import {
   Box,
   TextField,
   Typography,
-  Button,
   Link as MuiLink,
 } from '@mui/material';
 import Link from 'next/link';
@@ -12,9 +11,8 @@ import { regex } from '@/utils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { LoadingButton } from '@mui/lab';
-import { useAlert } from '@/hooks/useAlert';
-import { useError } from '@/hooks/useError';
-import { useUser } from '@/hooks';
+import { useError, useUser } from '@/hooks';
+
 
 interface IFormData {
   email: string;

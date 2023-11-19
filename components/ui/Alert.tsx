@@ -1,4 +1,4 @@
-import { useAlert } from '@/hooks/useAlert';
+import { useAlert } from '@/hooks';
 import { Snackbar, Alert as MuiAlert } from '@mui/material';
 
 export const Alert = () => {

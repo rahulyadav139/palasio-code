@@ -1,6 +1,5 @@
 'use client';
-import { useUser } from '@/hooks';
-import { useError } from '@/hooks/useError';
+import { useUser, useError } from '@/hooks';
 import { Typography } from '@mui/material';
 import axios from 'axios';
 import { ReactNode, useEffect, useState } from 'react';

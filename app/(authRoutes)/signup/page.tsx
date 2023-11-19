@@ -12,8 +12,7 @@ import { regex } from '@/utils';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { LoadingButton } from '@mui/lab';
-import { useAlert } from '@/hooks/useAlert';
-import { useError } from '@/hooks/useError';
+import { useError } from '@/hooks';
 
 interface IFormData {
   email: string;

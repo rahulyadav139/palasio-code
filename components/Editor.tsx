@@ -3,17 +3,11 @@
 import { Box } from '@mui/material';
 import React, { useState, FC, useCallback, useEffect } from 'react';
 import { basicSetup, minimalSetup } from 'codemirror';
-import { language } from '@codemirror/language';
 import { EditorView, keymap, lineNumbers, placeholder } from '@codemirror/view';
-import {
-  Compartment,
-  EditorSelection,
-  EditorState,
-  Extension,
-} from '@codemirror/state';
+import { Compartment, EditorState, Extension } from '@codemirror/state';
 import { indentWithTab } from '@codemirror/commands';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { IEditor } from '@/types/IEditor';
+import { IEditor } from '@/types';
 import { html } from '@codemirror/lang-html';
 import { css } from '@codemirror/lang-css';
 import { javascript } from '@codemirror/lang-javascript';

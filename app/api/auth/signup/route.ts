@@ -1,6 +1,6 @@
 import { mongoConnect, genPassword } from '@/utils';
 import { NextRequest, NextResponse } from 'next/server';
-import { User } from '@/models/user';
+import { User } from '@/models';
 
 export async function POST(req: NextRequest) {
   if (req.method !== 'POST') {

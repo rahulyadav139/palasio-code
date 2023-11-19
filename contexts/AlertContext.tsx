@@ -1,16 +1,10 @@
+'use client';
 import React, { ReactNode, createContext, useState } from 'react';
+import { IAlertContext } from '@/types';
 
 interface alertStateType {
   type: 'error' | 'warning' | 'success';
   message: string;
-}
-
-export interface IAlertContext {
-  alert: alertStateType | null;
-  setAlert: React.Dispatch<React.SetStateAction<alertStateType | null>>;
-  setError: (message: string) => void;
-  setSuccess: (message: string) => void;
-  setWarning: (message: string) => void;
 }
 
 export const AlertContext = createContext<IAlertContext | null>(null);

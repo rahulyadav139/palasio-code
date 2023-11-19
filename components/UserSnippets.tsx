@@ -2,10 +2,10 @@
 
 import { Typography, Box, Button } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import { SnippetCard } from './SnippetCard';
+import { SnippetCard } from '@/components';
 import axios from 'axios';
-import { ISnippet } from '@/types/ISnippet';
-import { useError } from '@/hooks/useError';
+import { ISnippet } from '@/types';
+import { useError } from '@/hooks';
 
 export const UserSnippets = () => {
   const [snippets, setSnippets] = useState<ISnippet[]>([]);

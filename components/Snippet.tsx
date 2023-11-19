@@ -1,12 +1,12 @@
 'use client';
-import { Editor } from '@/components/Editor';
+
+import { Editor } from '@/components';
 import { useTimeout } from '@/hooks';
 import { Add, Share, Home } from '@mui/icons-material';
 import { Box, IconButton, Stack, Typography, Tooltip } from '@mui/material';
 import React, { FC } from 'react';
 import Link from 'next/link';
-import { ISnippet } from '@/types/ISnippet';
-
+import { ISnippet } from '@/types';
 import { useRouter } from 'next/navigation';
 
 interface SnippetType {

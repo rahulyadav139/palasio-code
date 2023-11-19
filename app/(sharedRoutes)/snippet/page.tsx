@@ -1,5 +1,5 @@
 'use client';
-import { useTimeout, useUser } from '@/hooks';
+import { useTimeout, useUser, useError } from '@/hooks';
 import {
   Box,
   Collapse,
@@ -20,12 +20,11 @@ import {
   useCallback,
   useEffect,
 } from 'react';
-import { Editor } from '@/components/Editor';
+import { Editor } from '@/components';
 
 import langOptions from '@/assets/languageOptions.json';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { useError } from '@/hooks/useError';
 
 export interface ISnippetInfo {
   name: string;
@@ -59,7 +58,7 @@ export default function CreateSnippet() {
     setSnippetInfo({ name: `snippet-${uid}`, language: 'text' });
   }, []);
 
-  const saveSnippetHandler: any = useCallback(
+  const saveSnippetHandler = useCallback(
     async (data: string) => {
       try {
         setIsLoading(true);

@@ -1,12 +1,11 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { Typography } from '@mui/material';
 import { Header } from '@/components';
-import { useUser } from '@/hooks';
-import { useError } from '@/hooks/useError';
+import { useUser, useError } from '@/hooks';
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
   const { user, setUser } = useUser();

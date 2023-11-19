@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Snippet } from '@/models/snippet';
-import { mongoConnect } from '@/utils/mongoConnect';
+import { Snippet } from '@/models';
+import { mongoConnect } from '@/utils';
 
 export async function GET(
   req: NextRequest,
