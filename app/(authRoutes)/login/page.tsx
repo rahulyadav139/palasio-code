@@ -1,18 +1,12 @@
 'use client';
-import {
-  Box,
-  TextField,
-  Typography,
-  Link as MuiLink,
-} from '@mui/material';
+import { Box, TextField, Typography, Link as MuiLink } from '@mui/material';
 import Link from 'next/link';
 import { ChangeEvent, FormEventHandler, useEffect, useState } from 'react';
 import { regex } from '@/utils';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import {  useRouter, useSearchParams } from 'next/navigation';
 import { LoadingButton } from '@mui/lab';
 import { useError, useUser } from '@/hooks';
-
 
 interface IFormData {
   email: string;
@@ -22,6 +16,8 @@ interface IFormData {
 export default function Register() {
   const { errorHandler, getStatusCode } = useError();
   const router = useRouter();
+  const params = useSearchParams();
+
   const [formData, setFormData] = useState<IFormData>({
     email: '',
     password: '',
@@ -42,7 +38,10 @@ export default function Register() {
         ...formData,
         email: formData.email.toLowerCase(),
       });
-      router.replace('/home');
+
+      const redirectTo = params.get('redirect') ?? '/home';
+
+      router.replace(redirectTo);
     } catch (err) {
       let errorMessage: string | undefined;
 

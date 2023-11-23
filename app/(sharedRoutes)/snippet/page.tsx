@@ -80,7 +80,8 @@ export default function CreateSnippet() {
           window.history.replaceState(null, 'Page', `/snippet/${snippetId!}`);
 
           setIsSavedSnippet(true);
-          setIsAlert(true);
+
+          setIsAlert(!user);
         } else {
           const payload: Record<string, string> = {
             data,
@@ -155,7 +156,10 @@ export default function CreateSnippet() {
               background: '#292C33',
             },
           }}
-          onClick={() => router.push('/home')}
+          onClick={() => {
+            const path = user ? '/home' : '/login';
+            router.push(path);
+          }}
         >
           <Home />
         </IconButton>
