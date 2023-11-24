@@ -1,42 +1,38 @@
 'use client';
 
-import { useAlert, useError } from '@/hooks';
 import { ISnippet } from '@/types';
+import { dateFormatter } from '@/utils';
 import { Delete } from '@mui/icons-material';
-import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
-import axios from 'axios';
+import {
+  Box,
+  Chip,
+  CircularProgress,
+  IconButton,
+  Typography,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { FC, useState, SyntheticEvent } from 'react';
 
 interface ISnippetCard {
   snippet: ISnippet;
-  updateSnippets: () => Promise<void>;
+  onDelete: (id: string, originalUid: string | undefined) => Promise<void>;
 }
 
-export const SnippetCard: FC<ISnippetCard> = ({ snippet, updateSnippets }) => {
+export const SnippetCard: FC<ISnippetCard> = ({ snippet, onDelete }) => {
   const router = useRouter();
-  const { setSuccess } = useAlert();
   const [isLoading, setIsLoading] = useState(false);
-  const { errorHandler } = useError();
-  const deleteSnippetHandler = async (e: SyntheticEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-
-    try {
-      setIsLoading(true);
-
-      await axios.delete(`/api/user/snippets/${snippet._id}`);
-
-      await updateSnippets();
-      setSuccess('Snippet deleted!');
-    } catch (err) {
-      errorHandler(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const openSnippetHandler = () => {
     router.push(`/snippet/${snippet.uid}`);
+  };
+
+  const deleteSnippetHandler = async (e: SyntheticEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setIsLoading(true);
+
+    await onDelete(snippet.uid, snippet?.original_uid);
+
+    setIsLoading(false);
   };
   return (
     <Box
@@ -47,6 +43,7 @@ export const SnippetCard: FC<ISnippetCard> = ({ snippet, updateSnippets }) => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        gap: 1,
         transition: 'all 0.3s ease-in-out',
         cursor: 'pointer',
         minHeight: 56,
@@ -60,11 +57,24 @@ export const SnippetCard: FC<ISnippetCard> = ({ snippet, updateSnippets }) => {
       }}
       onClick={openSnippetHandler}
     >
-      <Typography variant="body2" fontWeight="bold">
-        {snippet.name}
-      </Typography>
+      <Box>
+        <Typography variant="body2" fontWeight="bold">
+          {snippet.name}
+        </Typography>
+        <Typography fontSize="12.8px">
+          {dateFormatter(snippet.created_at)}
+        </Typography>
+      </Box>
+      {snippet?.original_uid && (
+        <Chip
+          size="small"
+          label="Cloned"
+          color="error"
+          sx={{ ml: 'auto', fontSize: '10px', px: '0.7rem' }}
+        />
+      )}
       {!isLoading ? (
-        <IconButton onClick={deleteSnippetHandler} sx={{ ml: 'auto' }}>
+        <IconButton onClick={deleteSnippetHandler}>
           <Delete />
         </IconButton>
       ) : (

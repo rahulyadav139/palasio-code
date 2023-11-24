@@ -1,0 +1,52 @@
+[
+  {
+    "id": "quote-1",
+    "text": "Coding like poetry should be short and concise.",
+    "author": "Santosh Kalwar"
+  },
+  {
+    "id": "quote-2",
+    "text": "It’s not a bug; it’s an undocumented feature",
+    "author": "Anonymous"
+  },
+  {
+    "id": "quote-3",
+    "text": "First, solve the problem. Then, write the code.",
+    "author": "John Johnson"
+  },
+  {
+    "id": "quote-4",
+    "text": "Code is like humor. When you have to explain it, it’s bad.",
+    "author": "Cory House"
+  },
+  {
+    "id": "quote-5",
+    "text": "Make it work, make it right, make it fast.",
+    "author": "Kent Beck"
+  },
+  {
+    "id": "quote-6",
+    "text": "Clean code always looks like it was written by someone who cares.",
+    "author": "Robert C. Martin"
+  },
+  {
+    "id": "quote-7",
+    "text": "Of course, bad code can be cleaned up. But it’s very expensive.",
+    "author": "Robert C. Martin"
+  },
+  {
+    "id": "quote-8",
+    "text": "Confusion is part of programming.",
+    "author": "Felienne Hermans"
+  },
+  {
+    "id": "quote-9",
+    "text": "Experience is the name everyone gives to their mistakes.",
+    "author": "Oscar Wilde"
+  },
+  {
+    "id": "quote-10",
+    "text": "Software is like sex: it’s better when it’s free.",
+    "author": "Linus Torvalds"
+  }
+]

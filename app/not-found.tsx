@@ -18,7 +18,7 @@ export default function NotFound() {
       <Typography gutterBottom variant="body1">
         Page Not Found
       </Typography>
-      <MuiLink variant="body2" component={Link} href="/" underline="hover">
+      <MuiLink variant="body2" component={Link} href="/home" underline="hover">
         Return Home
       </MuiLink>
     </Box>

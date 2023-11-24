@@ -1,21 +1,86 @@
 'use client';
 
 import { Editor } from '@/components';
-import { useTimeout } from '@/hooks';
-import { Add, Share, Home } from '@mui/icons-material';
-import { Box, IconButton, Stack, Typography, Tooltip } from '@mui/material';
-import React, { FC } from 'react';
+import { useAlert, useTimeout } from '@/hooks';
+import {
+  Add,
+  Share,
+  Home,
+  BookmarkBorder,
+  Bookmark,
+} from '@mui/icons-material';
+import {
+  Box,
+  IconButton,
+  Stack,
+  Typography,
+  Tooltip,
+  CircularProgress,
+} from '@mui/material';
+import React, { FC, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ISnippet } from '@/types';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useUser, useError } from '@/hooks';
+import axios from 'axios';
 
 interface SnippetType {
   snippet: ISnippet;
 }
 
-export const Snippet: FC<SnippetType> = ({ snippet }) => {
+export const Snippet: FC<SnippetType> = ({ snippet: snippetData }) => {
+  const [snippet, setSnippet] = useState<ISnippet>(snippetData);
   const [isShareTooltip, setIsShareTooltip] = useTimeout(2);
   const router = useRouter();
+  const path = usePathname();
+  const { setWarning, setSuccess } = useAlert();
+
+  const { user, getUser, isLoading: isGettingUser } = useUser();
+  const { errorHandler } = useError();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (user) return;
+
+    getUser().catch(err => errorHandler(err));
+  }, [user]);
+
+  const saveSnippetHandler = async () => {
+    if (!user) {
+      return router.push(encodeURI(`/login?redirect=${path}`));
+    }
+
+    if (snippet.author === user?._id) {
+      return setWarning('You are owner of this snippet!');
+    }
+
+    try {
+      setIsLoading(true);
+      if (snippet.saved_by?.includes(user._id)) {
+        await axios.delete(`/api/user/snippets/${snippet.uid}/remove`);
+        setSnippet(prev => ({
+          ...prev,
+          saved_by: prev.saved_by?.filter(id => id !== user._id),
+        }));
+
+        setSuccess('Snippet removed');
+      } else {
+        const { data } = await axios.post(
+          `/api/user/snippets/${snippet.uid}/save`
+        );
+        setSnippet(prev => ({
+          ...prev,
+          saved_by: [...(prev.saved_by ?? []), user._id],
+        }));
+
+        setSuccess('Snippet saved');
+      }
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Box
@@ -51,8 +116,34 @@ export const Snippet: FC<SnippetType> = ({ snippet }) => {
         <Typography>{snippet.name}</Typography>
 
         <Stack direction="row" gap={1} alignItems="center" ml="auto">
+          {!isGettingUser && snippet?.author && !isLoading && (
+            <IconButton
+              sx={{
+                '&:hover': {
+                  background: '#292C33',
+                },
+                color: 'white',
+              }}
+              onClick={saveSnippetHandler}
+            >
+              {user && snippet.saved_by?.includes(user._id) ? (
+                <Bookmark />
+              ) : (
+                <BookmarkBorder />
+              )}
+            </IconButton>
+          )}
+          {(isLoading || isGettingUser) && snippet?.author && (
+            <CircularProgress size={20} />
+          )}
           <Link href="/snippet">
-            <IconButton>
+            <IconButton
+              sx={{
+                '&:hover': {
+                  background: '#292C33',
+                },
+              }}
+            >
               <Add sx={{ color: 'white' }} />
             </IconButton>
           </Link>
@@ -81,7 +172,7 @@ export const Snippet: FC<SnippetType> = ({ snippet }) => {
                 },
               }}
             >
-              <Share sx={{ fontSize: '1.2rem' }} />
+              <Share />
             </IconButton>
           </Tooltip>
         </Stack>

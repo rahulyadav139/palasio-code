@@ -4,3 +4,5 @@ export { Editor } from './Editor';
 export { Snippet } from './Snippet';
 export { Alert } from './ui/Alert';
 export { SnippetCard } from './SnippetCard';
+export { Loading } from './ui/Loading';
+export { SavedSnippets } from './SavedSnippets';

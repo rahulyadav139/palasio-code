@@ -22,9 +22,8 @@ export const Header = () => {
       router.push('/login');
     } catch (err) {
       errorHandler(err);
-    } finally {
       setIsLoading(false);
-    }
+    } 
   };
 
   return (

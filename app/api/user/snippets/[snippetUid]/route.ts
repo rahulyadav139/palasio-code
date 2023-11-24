@@ -5,7 +5,7 @@ import { Snippet } from '@/models';
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { snippetId: string } }
+  { params }: { params: { snippetUid: string } }
 ) {
   try {
     const token = req.cookies.get('token');
@@ -21,7 +21,7 @@ export async function DELETE(
     const { sub: userId } = jwt.verify(token.value, process.env.JWT_SECRET!);
     await mongoConnect();
 
-    await Snippet.findOneAndDelete({ _id: params.snippetId, author: userId });
+    await Snippet.findOneAndDelete({ uid: params.snippetUid, author: userId });
 
     return NextResponse.json(
       {

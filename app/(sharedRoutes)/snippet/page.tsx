@@ -1,5 +1,5 @@
 'use client';
-import { useTimeout, useUser, useError } from '@/hooks';
+import { useTimeout, useUser, useError, useAlert } from '@/hooks';
 import {
   Box,
   Collapse,
@@ -12,7 +12,7 @@ import {
   CircularProgress,
   Tooltip,
 } from '@mui/material';
-import { Close, Edit, Home, Login, Save, Share } from '@mui/icons-material';
+import { Close, Edit, Home, Save, Share } from '@mui/icons-material';
 import {
   useState,
   useLayoutEffect,
@@ -38,6 +38,7 @@ const initialSnippetInfo: ISnippetInfo = {
 
 export default function CreateSnippet() {
   const [isAlert, setIsAlert] = useTimeout(8);
+  const { setError } = useAlert();
   const [isShareTooltip, setIsShareTooltip] = useTimeout(2);
   const [snippetId, setSnippetId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -60,7 +61,7 @@ export default function CreateSnippet() {
 
   const saveSnippetHandler = useCallback(
     async (data: string) => {
-      if (!data || (data && !data.trim())) return;
+      if (!data || (data && !data.trim())) return setError('Empty snippet!');
       try {
         setIsLoading(true);
 
@@ -80,7 +81,8 @@ export default function CreateSnippet() {
           window.history.replaceState(null, 'Page', `/snippet/${snippetId!}`);
 
           setIsSavedSnippet(true);
-          setIsAlert(true);
+
+          setIsAlert(!user);
         } else {
           const payload: Record<string, string> = {
             data,
@@ -155,7 +157,10 @@ export default function CreateSnippet() {
               background: '#292C33',
             },
           }}
-          onClick={() => router.push('/home')}
+          onClick={() => {
+            const path = user ? '/home' : '/login';
+            router.push(path);
+          }}
         >
           <Home />
         </IconButton>

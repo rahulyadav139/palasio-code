@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { mongoConnect } from '@/utils';
 import { Snippet } from '@/models';
+import { FilterQuery } from 'mongoose';
+import { ISnippet } from '@/schema';
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  test: { searchParams?: { [key: string]: string | string[] | undefined } }
+) {
   if (req.method !== 'GET') {
     return NextResponse.json({
       success: false,
@@ -31,7 +36,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: 'user fetched successfully',
+        message: 'snippets fetched successfully',
         snippets,
       },
       { status: 200 }

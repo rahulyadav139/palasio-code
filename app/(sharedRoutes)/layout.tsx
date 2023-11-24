@@ -1,35 +1,21 @@
 'use client';
 import { useUser, useError } from '@/hooks';
-import { Typography } from '@mui/material';
 import axios from 'axios';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 export default function SharedRoutesLayout({
   children,
 }: {
   children: ReactNode;
 }) {
-  const { user, setUser } = useUser();
+  const { user, getUser } = useUser();
   const { errorHandler } = useError();
-  const [isLoading, setIsLoading] = useState<boolean>(!user);
 
   useEffect(() => {
     if (user) return;
 
-    (async () => {
-      try {
-        const { data } = await axios.get('/api/user');
-
-        setUser(data.user);
-      } catch (err) {
-        errorHandler(err);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
+    getUser().catch(err => errorHandler(err));
   }, [user]);
-
-  if (isLoading) return <Typography variant="body2">Loading...</Typography>;
 
   return children;
 }
