@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { ChangeEvent, FormEventHandler, useEffect, useState } from 'react';
 import { regex } from '@/utils';
 import axios from 'axios';
-import {  useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { LoadingButton } from '@mui/lab';
 import { useError, useUser } from '@/hooks';
 
@@ -24,7 +24,7 @@ export default function Register() {
   });
   const [isFormValid, setIsFormValid] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { setUser, user } = useUser();
+  const { removeUser, user } = useUser();
   const loginHandler: FormEventHandler = async e => {
     e.preventDefault();
 
@@ -58,7 +58,7 @@ export default function Register() {
 
   useEffect(() => {
     if (user) {
-      setUser(null);
+      removeUser();
     }
   }, [user]);
 

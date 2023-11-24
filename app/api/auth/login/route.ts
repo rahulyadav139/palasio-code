@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     const responseBody = {
       success: true,
-      message: 'user fetched successfully',
+      message: 'user login successfully',
       token,
     };
 

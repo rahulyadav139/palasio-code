@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
 
 export interface ISnippet {
-  _id: mongoose.Types.ObjectId | string;
+  _id: mongoose.Types.ObjectId;
   data: string;
-  author?: mongoose.Types.ObjectId | string;
+  author?: mongoose.Types.ObjectId;
+  saved_by?: mongoose.Types.ObjectId[];
   language: string;
   name: string;
   uid: string;
+  original_uid?: string;
 }

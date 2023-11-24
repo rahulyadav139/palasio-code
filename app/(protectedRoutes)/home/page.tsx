@@ -1,14 +1,19 @@
-import { UserSnippets } from '@/components';
+import { SavedSnippets, UserSnippets } from '@/components';
 import { Box, Divider, Typography } from '@mui/material';
 
 export default function Home() {
   return (
     <Box sx={{ p: 1 }}>
       <Typography variant="body1" fontWeight="bold">
-        Snippets
+        Your Snippets
       </Typography>
       <Divider />
       <UserSnippets />
+      {/* <Typography variant="body1" fontWeight="bold">
+        Saved Snippets
+      </Typography>
+      <Divider />
+      <SavedSnippets /> */}
     </Box>
   );
 }

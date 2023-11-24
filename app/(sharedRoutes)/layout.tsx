@@ -8,22 +8,23 @@ export default function SharedRoutesLayout({
 }: {
   children: ReactNode;
 }) {
-  const { user, setUser } = useUser();
+  const { user, getUser } = useUser();
   const { errorHandler } = useError();
-
 
   useEffect(() => {
     if (user) return;
 
-    (async () => {
-      try {
-        const { data } = await axios.get('/api/user');
+    getUser().catch(err => errorHandler(err));
 
-        setUser(data.user);
-      } catch (err) {
-        errorHandler(err);
-      } 
-    })();
+    // (async () => {
+    //   try {
+    //     const { data } = await axios.get('/api/user');
+
+    //     setUser(data.user);
+    //   } catch (err) {
+    //     errorHandler(err);
+    //   }
+    // })();
   }, [user]);
 
   return children;

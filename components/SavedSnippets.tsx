@@ -7,7 +7,7 @@ import axios from 'axios';
 import { ISnippet } from '@/types';
 import { useAlert, useError } from '@/hooks';
 
-export const UserSnippets = () => {
+export const SavedSnippets = () => {
   const [snippets, setSnippets] = useState<ISnippet[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [enableReload, setEnableReload] = useState<boolean>(false);
@@ -18,7 +18,7 @@ export const UserSnippets = () => {
     if (!isLoading) return;
     (async () => {
       try {
-        const { data } = await axios.get('/api/user/snippets');
+        const { data } = await axios.get('/api/user/snippets?createdBy=others');
 
         setSnippets(data.snippets);
       } catch (err) {
@@ -30,21 +30,11 @@ export const UserSnippets = () => {
     })();
   }, [isLoading]);
 
-  const removeSnippetHandler = async (
-    snippetUid: string,
-    originalUid: string | undefined
-  ) => {
+  const removeSnippetHandler = async (snippetId: string) => {
     try {
-      let url: string | undefined;
-
-      if (originalUid) {
-        url = `/api/user/snippets/${originalUid}/remove`;
-      } else {
-        url = `/api/user/snippets/${snippetUid}`;
-      }
-      await axios.delete(url);
-      setSnippets(prev => prev.filter(snippet => snippet.uid !== snippetUid));
-      setSuccess('Snippet deleted!');
+      await axios.delete(`/api/user/snippets/${snippetId}/remove`);
+      setSnippets(prev => prev.filter(snippet => snippet._id !== snippetId));
+      setSuccess('Snippet removed!');
     } catch (err) {
       errorHandler(err);
     }
@@ -90,7 +80,7 @@ export const UserSnippets = () => {
       )}
       {snippets.map(snippet => (
         <SnippetCard
-          onDelete={removeSnippetHandler}
+          onDelete={() => removeSnippetHandler(snippet._id)}
           key={snippet._id}
           snippet={snippet}
         />

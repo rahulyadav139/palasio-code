@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
   try {
     await mongoConnect();
-    const snippet = new Snippet(data);
+    const snippet = new Snippet({ ...data, saved_by: [] });
 
     await snippet.save();
 

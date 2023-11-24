@@ -1,5 +1,5 @@
 'use client';
-import { useTimeout, useUser, useError } from '@/hooks';
+import { useTimeout, useUser, useError, useAlert } from '@/hooks';
 import {
   Box,
   Collapse,
@@ -38,6 +38,7 @@ const initialSnippetInfo: ISnippetInfo = {
 
 export default function CreateSnippet() {
   const [isAlert, setIsAlert] = useTimeout(8);
+  const { setError } = useAlert();
   const [isShareTooltip, setIsShareTooltip] = useTimeout(2);
   const [snippetId, setSnippetId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -60,7 +61,7 @@ export default function CreateSnippet() {
 
   const saveSnippetHandler = useCallback(
     async (data: string) => {
-      if (!data || (data && !data.trim())) return;
+      if (!data || (data && !data.trim())) return setError('Empty snippet!');
       try {
         setIsLoading(true);
 

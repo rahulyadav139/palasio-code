@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { mongoConnect } from '@/utils';
 import { Snippet } from '@/models';
+import { FilterQuery } from 'mongoose';
+import { ISnippet } from '@/schema';
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  test: { searchParams?: { [key: string]: string | string[] | undefined } }
+) {
   if (req.method !== 'GET') {
     return NextResponse.json({
       success: false,
@@ -26,12 +31,38 @@ export async function GET(req: NextRequest) {
   try {
     await mongoConnect();
 
+    // const filter: FilterQuery<ISnippet> = {};
+
+    // const searchParams = new URLSearchParams(req.nextUrl.searchParams);
+
+    // const snippetsCreatedBy = searchParams.get('createdBy');
+
+    // switch (snippetsCreatedBy) {
+    //   case 'me':
+    //     filter.author = userId;
+    //     break;
+    //   case 'others':
+    //     filter.saved_by = userId;
+    //     break;
+    //   default:
+    //     filter.$or = [
+    //       {
+    //         author: userId,
+    //       },
+    //       {
+    //         saved_by: { $in: userId },
+    //       },
+    //     ];
+    // }
+
     const snippets = await Snippet.find({ author: userId });
+
+    console.log(snippets, 's');
 
     return NextResponse.json(
       {
         success: false,
-        message: 'user fetched successfully',
+        message: 'snippets fetched successfully',
         snippets,
       },
       { status: 200 }
