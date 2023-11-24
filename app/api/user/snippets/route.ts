@@ -31,33 +31,7 @@ export async function GET(
   try {
     await mongoConnect();
 
-    // const filter: FilterQuery<ISnippet> = {};
-
-    // const searchParams = new URLSearchParams(req.nextUrl.searchParams);
-
-    // const snippetsCreatedBy = searchParams.get('createdBy');
-
-    // switch (snippetsCreatedBy) {
-    //   case 'me':
-    //     filter.author = userId;
-    //     break;
-    //   case 'others':
-    //     filter.saved_by = userId;
-    //     break;
-    //   default:
-    //     filter.$or = [
-    //       {
-    //         author: userId,
-    //       },
-    //       {
-    //         saved_by: { $in: userId },
-    //       },
-    //     ];
-    // }
-
     const snippets = await Snippet.find({ author: userId });
-
-    console.log(snippets, 's');
 
     return NextResponse.json(
       {

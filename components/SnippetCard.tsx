@@ -1,6 +1,5 @@
 'use client';
 
-import { useAlert, useError } from '@/hooks';
 import { ISnippet } from '@/types';
 import { dateFormatter } from '@/utils';
 import { Delete } from '@mui/icons-material';

@@ -12,7 +12,7 @@ import {
   CircularProgress,
   Tooltip,
 } from '@mui/material';
-import { Close, Edit, Home, Login, Save, Share } from '@mui/icons-material';
+import { Close, Edit, Home, Save, Share } from '@mui/icons-material';
 import {
   useState,
   useLayoutEffect,

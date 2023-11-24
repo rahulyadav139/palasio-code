@@ -15,16 +15,6 @@ export default function SharedRoutesLayout({
     if (user) return;
 
     getUser().catch(err => errorHandler(err));
-
-    // (async () => {
-    //   try {
-    //     const { data } = await axios.get('/api/user');
-
-    //     setUser(data.user);
-    //   } catch (err) {
-    //     errorHandler(err);
-    //   }
-    // })();
   }, [user]);
 
   return children;

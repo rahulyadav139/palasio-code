@@ -9,11 +9,6 @@ export default function Home() {
       </Typography>
       <Divider />
       <UserSnippets />
-      {/* <Typography variant="body1" fontWeight="bold">
-        Saved Snippets
-      </Typography>
-      <Divider />
-      <SavedSnippets /> */}
     </Box>
   );
 }

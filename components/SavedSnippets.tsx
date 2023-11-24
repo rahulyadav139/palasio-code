@@ -1,7 +1,7 @@
 'use client';
 
 import { Typography, Box, Button, Skeleton } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SnippetCard } from '@/components';
 import axios from 'axios';
 import { ISnippet } from '@/types';
