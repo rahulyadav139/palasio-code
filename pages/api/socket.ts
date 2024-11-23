@@ -29,7 +29,15 @@ export default function SocketHandler(
     console.log('Socket is already running');
   } else {
     console.log('Socket is initializing');
-    const io = new Server(res.socket.server);
+    const io = new Server(res.socket.server, {
+      transports: ['websocket', 'polling'], // Allow both WebSocket and polling
+      cors: {
+        origin: 'https://www.palasio.in', // Allow only your frontend URL
+        methods: ['GET', 'POST'],
+        allowedHeaders: ['my-custom-header'],
+        credentials: true,
+      },
+    });
 
     const ysocketio = new YSocketIO(io, {
       authenticate: handshake => {
@@ -43,6 +51,7 @@ export default function SocketHandler(
         //   return false;
         // }
       },
+
       gcEnabled: true,
     });
     ysocketio.initialize();
