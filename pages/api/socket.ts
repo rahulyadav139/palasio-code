@@ -34,8 +34,6 @@ export default function SocketHandler(
       cors: {
         origin: 'https://www.palasio.in', // Allow only your frontend URL
         methods: ['GET', 'POST'],
-        allowedHeaders: ['my-custom-header'],
-        credentials: true,
       },
     });
 
