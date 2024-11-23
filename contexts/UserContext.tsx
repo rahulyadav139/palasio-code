@@ -4,7 +4,7 @@ import { IUser } from '@/types/IUser';
 import React, { ReactNode, createContext, useState } from 'react';
 import { IUserContext } from '@/types';
 import { useError } from '@/hooks';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 export const UserContext = createContext<IUserContext | null>(null);
 
@@ -20,7 +20,6 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
       setUser(data.user);
     } catch (err) {
-      // errorHandler(err);
       throw err;
     } finally {
       setIsLoading(false);

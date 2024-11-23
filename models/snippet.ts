@@ -9,7 +9,9 @@ const snippetSchema = new mongoose.Schema<ISnippet>(
     language: String,
     name: String,
     author: { type: mongoose.Types.ObjectId, ref: 'User' },
-    saved_by: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+    // saved_by: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+    collaborators: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+    isCollaborative: { type: Boolean, default: false },
   },
   { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } }
 );

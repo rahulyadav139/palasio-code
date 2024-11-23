@@ -1,18 +1,30 @@
 'use client';
 
-import { Typography, Box, Button, Skeleton } from '@mui/material';
+import { Typography, Box, Button, Skeleton, Tabs, Tab } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { SnippetCard } from '@/components';
 import axios from 'axios';
 import { ISnippet } from '@/types';
-import { useAlert, useError } from '@/hooks';
+import { useAlert, useError, useUser } from '@/hooks';
+import { useRouter } from 'next/navigation';
+
+enum SnippetType {
+  STANDARD = 'STANDARD',
+  COLLABORATIVE = 'COLLABORATIVE',
+}
 
 export const UserSnippets = () => {
   const [snippets, setSnippets] = useState<ISnippet[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [enableReload, setEnableReload] = useState<boolean>(false);
+  const [snippetType, setSnippetType] = useState<SnippetType>(
+    SnippetType.STANDARD
+  );
+
   const { errorHandler } = useError();
   const { setSuccess } = useAlert();
+  const { user } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     if (!isLoading) return;
@@ -30,20 +42,10 @@ export const UserSnippets = () => {
     })();
   }, [isLoading]);
 
-  const removeSnippetHandler = async (
-    snippetUid: string,
-    originalUid: string | undefined
-  ) => {
+  const deleteSnippetHandler = async (snippetId: string) => {
     try {
-      let url: string | undefined;
-
-      if (originalUid) {
-        url = `/api/user/snippets/${originalUid}/remove`;
-      } else {
-        url = `/api/user/snippets/${snippetUid}`;
-      }
-      await axios.delete(url);
-      setSnippets(prev => prev.filter(snippet => snippet.uid !== snippetUid));
+      await axios.delete(`/api/user/snippets/${snippetId}`);
+      setSnippets(prev => prev.filter(snippet => snippet._id !== snippetId));
       setSuccess('Snippet deleted!');
     } catch (err) {
       errorHandler(err);
@@ -88,13 +90,55 @@ export const UserSnippets = () => {
       {!Boolean(snippets.length) && !isLoading && !enableReload && (
         <Typography>No snippets</Typography>
       )}
-      {snippets.map(snippet => (
-        <SnippetCard
-          onDelete={removeSnippetHandler}
-          key={snippet._id}
-          snippet={snippet}
-        />
-      ))}
+
+      {Boolean(snippets.length) && !isLoading && (
+        <>
+          <Tabs
+            value={snippetType}
+            onChange={(e, newValue) => setSnippetType(newValue)}
+            sx={{
+              '& .MuiButtonBase-root': {
+                textTransform: 'initial',
+              },
+            }}
+          >
+            <Tab label="Standard" value={SnippetType.STANDARD} />
+            <Tab label="Collaborative" value={SnippetType.COLLABORATIVE} />
+          </Tabs>
+
+          {snippetType === SnippetType.STANDARD &&
+            snippets
+              .filter(snippet => !snippet.isCollaborative)
+              .map(snippet => (
+                <SnippetCard
+                  {...(snippet.author === user?._id && {
+                    onDelete: () => deleteSnippetHandler(snippet._id),
+                  })}
+                  key={snippet._id}
+                  snippet={snippet}
+                  onClick={() => {
+                    router.push(`/snippet/${snippet.uid}`);
+                  }}
+                />
+              ))}
+
+          {snippetType === SnippetType.COLLABORATIVE &&
+            snippets
+              .filter(snippet => snippet.isCollaborative)
+              .map(snippet => (
+                <SnippetCard
+                  {...(snippet.author === user?._id && {
+                    onDelete: () => deleteSnippetHandler(snippet._id),
+                  })}
+                  key={snippet._id}
+                  snippet={snippet}
+                  onClick={() => {
+                    router.push(`/collab/${snippet.uid}`);
+                  }}
+                />
+              ))}
+        </>
+      )}
     </Box>
   );
 };

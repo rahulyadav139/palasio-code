@@ -1,86 +1,82 @@
 'use client';
 
 import { Editor } from '@/components';
-import { useAlert, useTimeout } from '@/hooks';
-import {
-  Add,
-  Share,
-  Home,
-  BookmarkBorder,
-  Bookmark,
-} from '@mui/icons-material';
-import {
-  Box,
-  IconButton,
-  Stack,
-  Typography,
-  Tooltip,
-  CircularProgress,
-} from '@mui/material';
-import React, { FC, useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useAlert } from '@/hooks';
+import { Box } from '@mui/material';
+import React, { FC, useRef, useState } from 'react';
 import { ISnippet } from '@/types';
 import { usePathname, useRouter } from 'next/navigation';
 import { useUser, useError } from '@/hooks';
 import axios from 'axios';
+import { SnippetHeader } from './SnippetHeader';
 
 interface SnippetType {
   snippet: ISnippet;
 }
 
-export const Snippet: FC<SnippetType> = ({ snippet: snippetData }) => {
-  const [snippet, setSnippet] = useState<ISnippet>(snippetData);
-  const [isShareTooltip, setIsShareTooltip] = useTimeout(2);
+export const Snippet: FC<SnippetType> = ({ snippet }) => {
+  const [snippetInfo, setSnippetInfo] = useState<{
+    name: string;
+    language: string;
+  }>({ name: snippet.name, language: snippet.language });
   const router = useRouter();
   const path = usePathname();
-  const { setWarning, setSuccess } = useAlert();
+  const { setSuccess } = useAlert();
 
-  const { user, getUser, isLoading: isGettingUser } = useUser();
+  const { user } = useUser();
   const { errorHandler } = useError();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (user) return;
+  const editor = useRef<{ getValue: () => string } | null>(null);
 
-    getUser().catch(err => errorHandler(err));
-  }, [user]);
-
-  const saveSnippetHandler = async () => {
+  const forkSnippetHandler = async () => {
     if (!user) {
       return router.push(encodeURI(`/login?redirect=${path}`));
     }
 
-    if (snippet.author === user?._id) {
-      return setWarning('You are owner of this snippet!');
-    }
-
     try {
       setIsLoading(true);
-      if (snippet.saved_by?.includes(user._id)) {
-        await axios.delete(`/api/user/snippets/${snippet.uid}/remove`);
-        setSnippet(prev => ({
-          ...prev,
-          saved_by: prev.saved_by?.filter(id => id !== user._id),
-        }));
+      const [uid] = window.crypto.randomUUID().split('-');
 
-        setSuccess('Snippet removed');
-      } else {
-        const { data } = await axios.post(
-          `/api/user/snippets/${snippet.uid}/save`
-        );
-        setSnippet(prev => ({
-          ...prev,
-          saved_by: [...(prev.saved_by ?? []), user._id],
-        }));
+      const payload: Record<string, string> = {
+        data: snippet.data,
+        author: user._id,
+        original_uid: snippet.uid,
+        language: snippet.language,
+        name: `${snippet.name} (copy)`,
+        uid,
+      };
 
-        setSuccess('Snippet saved');
-      }
+      await axios.post('/api/snippet', payload);
+
+      setSuccess('Snippet forked!');
+
+      router.push(`/snippet/${uid}`);
     } catch (err) {
       errorHandler(err);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const saveSnippetHandler = async () => {
+    try {
+      setIsLoading(true);
+      const { name, language } = snippetInfo;
+
+      await axios.patch(`/api/user/snippets/${snippet._id}`, {
+        name,
+        language,
+        data: editor.current?.getValue(),
+      });
+    } catch (err) {
+      errorHandler(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const readOnly = !user || snippet.author !== user._id;
 
   return (
     <Box
@@ -91,93 +87,21 @@ export const Snippet: FC<SnippetType> = ({ snippet: snippetData }) => {
         flexDirection: 'column',
       }}
     >
-      <Box
-        component="nav"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          p: 1,
-          gap: 1,
-          background: 'black',
-          color: 'white',
-        }}
-      >
-        <IconButton
-          sx={{
-            color: 'white',
-            '&:hover': {
-              background: '#292C33',
-            },
-          }}
-          onClick={() => router.push('/home')}
-        >
-          <Home />
-        </IconButton>
-        <Typography>{snippet.name}</Typography>
-
-        <Stack direction="row" gap={1} alignItems="center" ml="auto">
-          {!isGettingUser && snippet?.author && !isLoading && (
-            <IconButton
-              sx={{
-                '&:hover': {
-                  background: '#292C33',
-                },
-                color: 'white',
-              }}
-              onClick={saveSnippetHandler}
-            >
-              {user && snippet.saved_by?.includes(user._id) ? (
-                <Bookmark />
-              ) : (
-                <BookmarkBorder />
-              )}
-            </IconButton>
-          )}
-          {(isLoading || isGettingUser) && snippet?.author && (
-            <CircularProgress size={20} />
-          )}
-          <Link href="/snippet">
-            <IconButton
-              sx={{
-                '&:hover': {
-                  background: '#292C33',
-                },
-              }}
-            >
-              <Add sx={{ color: 'white' }} />
-            </IconButton>
-          </Link>
-
-          <Tooltip
-            title="Link copied!"
-            disableFocusListener
-            disableHoverListener
-            disableTouchListener
-            open={isShareTooltip}
-            placement="bottom"
-          >
-            <IconButton
-              onClick={() => {
-                setIsShareTooltip(true);
-                navigator.clipboard.writeText(window.location.href);
-              }}
-              sx={{
-                color: 'white',
-                '&.Mui-disabled': {
-                  color: 'white',
-                  opacity: 0.7,
-                },
-                '&:hover': {
-                  background: '#292C33',
-                },
-              }}
-            >
-              <Share />
-            </IconButton>
-          </Tooltip>
-        </Stack>
-      </Box>
-      <Editor doc={snippet.data} readonly={true} language={snippet.language} />
+      <SnippetHeader
+        snippetInfo={snippetInfo}
+        editMode={!readOnly}
+        onEdit={value => setSnippetInfo(prev => ({ ...prev, ...value }))}
+        onFork={forkSnippetHandler}
+        onSave={saveSnippetHandler}
+        loading={isLoading}
+      />
+      <Editor
+        ref={editor}
+        key={snippet.uid}
+        initialState={snippet.data}
+        readonly={readOnly}
+        language={snippetInfo.language}
+      />
     </Box>
   );
 };

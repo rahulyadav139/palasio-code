@@ -1,9 +1,15 @@
 'use client';
 
 import { useUser, useError } from '@/hooks';
-import { Add } from '@mui/icons-material';
+import { Add, ContactPage, Groups } from '@mui/icons-material';
 import { LoadingButton } from '@mui/lab';
-import { Box, IconButton, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -13,6 +19,7 @@ export const Header = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { errorHandler } = useError();
+  const [isCreatingSnippet, setIsCreatingSnippet] = useState<boolean>(false);
 
   const userLogoutHandler = async () => {
     try {
@@ -23,7 +30,31 @@ export const Header = () => {
     } catch (err) {
       errorHandler(err);
       setIsLoading(false);
-    } 
+    }
+  };
+
+  const createCollaborationSnippet = async () => {
+    try {
+      setIsCreatingSnippet(true);
+      const [uid] = window.crypto.randomUUID().split('-');
+
+      const payload = {
+        name: `collab-${uid}`,
+        uid,
+        data: '',
+        language: 'text',
+        // collaborators: [user._id],
+        isCollaborative: true,
+        author: user._id,
+      };
+
+      await axios.post('/api/snippet', payload);
+      router.push(`/collab/${uid}`);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsCreatingSnippet(false);
+    }
   };
 
   return (
@@ -46,9 +77,20 @@ export const Header = () => {
         component="nav"
         sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
       >
-        <IconButton onClick={() => router.push('/snippet')}>
-          <Add />
-        </IconButton>
+        {isCreatingSnippet ? (
+          <CircularProgress size={20} />
+        ) : (
+          <Tooltip title="New collaborative snippet">
+            <IconButton onClick={createCollaborationSnippet}>
+              <ContactPage />
+            </IconButton>
+          </Tooltip>
+        )}
+        <Tooltip title="New snippet">
+          <IconButton onClick={() => router.push('/snippet')}>
+            <Add />
+          </IconButton>
+        </Tooltip>
         <LoadingButton
           loading={isLoading}
           variant="contained"

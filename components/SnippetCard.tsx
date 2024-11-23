@@ -3,34 +3,27 @@
 import { ISnippet } from '@/types';
 import { dateFormatter } from '@/utils';
 import { Delete } from '@mui/icons-material';
-import {
-  Box,
-  Chip,
-  CircularProgress,
-  IconButton,
-  Typography,
-} from '@mui/material';
-import { useRouter } from 'next/navigation';
+import { Box, CircularProgress, IconButton, Typography } from '@mui/material';
 import { FC, useState, SyntheticEvent } from 'react';
 
 interface ISnippetCard {
   snippet: ISnippet;
-  onDelete: (id: string, originalUid: string | undefined) => Promise<void>;
+  onDelete?: (id: string, originalUid: string | undefined) => Promise<void>;
+  onClick: () => void;
 }
 
-export const SnippetCard: FC<ISnippetCard> = ({ snippet, onDelete }) => {
-  const router = useRouter();
+export const SnippetCard: FC<ISnippetCard> = ({
+  snippet,
+  onDelete,
+  onClick,
+}) => {
   const [isLoading, setIsLoading] = useState(false);
-
-  const openSnippetHandler = () => {
-    router.push(`/snippet/${snippet.uid}`);
-  };
 
   const deleteSnippetHandler = async (e: SyntheticEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     setIsLoading(true);
 
-    await onDelete(snippet.uid, snippet?.original_uid);
+    await onDelete?.(snippet.uid, snippet?.original_uid);
 
     setIsLoading(false);
   };
@@ -55,7 +48,7 @@ export const SnippetCard: FC<ISnippetCard> = ({ snippet, onDelete }) => {
           },
         }),
       }}
-      onClick={openSnippetHandler}
+      onClick={onClick}
     >
       <Box>
         <Typography variant="body2" fontWeight="bold">
@@ -65,21 +58,14 @@ export const SnippetCard: FC<ISnippetCard> = ({ snippet, onDelete }) => {
           {dateFormatter(snippet.created_at)}
         </Typography>
       </Box>
-      {snippet?.original_uid && (
-        <Chip
-          size="small"
-          label="Cloned"
-          color="error"
-          sx={{ ml: 'auto', fontSize: '10px', px: '0.7rem' }}
-        />
-      )}
-      {!isLoading ? (
+
+      {!isLoading && Boolean(onDelete) && (
         <IconButton onClick={deleteSnippetHandler}>
           <Delete />
         </IconButton>
-      ) : (
-        <CircularProgress size={20} />
       )}
+
+      {isLoading && <CircularProgress size={20} />}
     </Box>
   );
 };

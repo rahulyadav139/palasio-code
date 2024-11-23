@@ -1,7 +1,18 @@
+import { Doc } from 'yjs';
+
+interface Collaboration {
+  roomId: string;
+  doc: Doc;
+  awareness?: {
+    name?: string;
+    color?: string;
+  };
+  onConnected?: () => void;
+}
+
 export interface IEditor {
-  doc: string;
+  initialState?: string;
   readonly?: boolean;
-  saveData?: boolean;
-  saveDataHandler?: (string) => void;
   language: string;
+  collaboration?: Collaboration;
 }

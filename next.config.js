@@ -9,6 +9,26 @@ const nextConfig = {
       },
     ];
   },
+  headers: () => [
+    {
+      source: '/api/socket',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'no-store',
+        },
+      ],
+    },
+    {
+      source: '/collab/:snippetId',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'no-store',
+        },
+      ],
+    },
+  ],
 };
 
 module.exports = nextConfig;

@@ -4,3 +4,6 @@ export { genPassword } from './genPassword';
 export { genToken } from './genToken';
 export { isPasswordValid } from './validator';
 export { dateFormatter } from './formatter';
+export { escapeRegExp } from './escapeRegExp';
+export { debounce } from './debounce';
+export { randomColor } from './randomColor';
