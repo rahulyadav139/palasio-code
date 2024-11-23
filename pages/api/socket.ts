@@ -32,7 +32,7 @@ export default function SocketHandler(
     const io = new Server(res.socket.server, {
       transports: ['websocket', 'polling'], // Allow both WebSocket and polling
       cors: {
-        origin: 'https://palasio.in', // Allow only your frontend URL
+        origin: '*', // Allow only your frontend URL
         methods: ['GET', 'POST'],
       },
     });
