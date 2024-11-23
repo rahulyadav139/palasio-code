@@ -1,7 +1,15 @@
 'use client';
 
 import { Box } from '@mui/material';
-import React, { useState, FC, useCallback, useEffect } from 'react';
+import React, {
+  useState,
+  FC,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  memo,
+  forwardRef,
+} from 'react';
 import { basicSetup, minimalSetup } from 'codemirror';
 import { EditorView, keymap, lineNumbers, placeholder } from '@codemirror/view';
 import { Compartment, EditorState, Extension } from '@codemirror/state';
@@ -19,6 +27,11 @@ import { markdown } from '@codemirror/lang-markdown';
 import { php } from '@codemirror/lang-php';
 import { java } from '@codemirror/lang-java';
 import { LanguageSupport } from '@codemirror/language';
+import { randomColor } from '@/utils';
+import { SocketIOProvider } from 'y-socket.io';
+import * as Y from 'yjs';
+// @ts-ignore
+import { yCollab } from 'y-codemirror.next';
 
 const extHolder = new Compartment();
 
@@ -35,82 +48,163 @@ const languages: Record<string, () => LanguageSupport> = {
   rust,
 };
 
-export const Editor: FC<IEditor> = ({
-  doc,
-  readonly,
-  saveData,
-  saveDataHandler,
-  language: lang,
-}) => {
-  const [editor, setEditor] = useState<EditorView | null>(null);
+const color = randomColor();
 
-  const editorContainer = useCallback(
-    (node: HTMLElement) => {
-      if (!node) return;
+export const Editor = memo(
+  forwardRef(
+    (
+      { initialState, collaboration, readonly, language: lang }: IEditor,
+      ref
+    ) => {
+      const [editor, setEditor] = useState<EditorView | null>(null);
+      const [provider, setProvider] = useState<SocketIOProvider | null>(null);
 
-      if (editor) {
-        editor.destroy();
-      }
+      const [isInitialized, setIsInitialized] = useState(
+        !Boolean(collaboration)
+      );
 
-      const extensions = [
-        keymap.of([indentWithTab]),
-        oneDark,
-        EditorView.editable.of(!readonly),
-        EditorState.readOnly.of(!!readonly),
-        placeholder('> Start typing here...'),
-        extHolder.of([]),
-      ];
+      const websocketData = collaboration?.doc.toJSON()?.data;
 
-      const initialState = EditorState.create({
-        doc,
-        extensions,
-      });
+      useEffect(() => {
+        if (!isInitialized && editor) {
+          if (websocketData && initialState !== websocketData) {
+            editor?.dispatch({
+              changes: {
+                from: 0,
+                to: editor.state.doc.length,
+                insert: websocketData,
+              },
+            });
 
-      const view = new EditorView({
-        state: initialState,
-        parent: node,
-      });
+            setIsInitialized(true);
+          }
+        }
+      }, [websocketData, isInitialized, editor]);
 
-      if (!readonly) {
-        view.focus();
-      }
-      setEditor(view);
-    },
-    [doc, readonly]
-  );
+      useImperativeHandle(
+        ref,
+        () => ({
+          getValue: () => editor?.state.doc.toString(),
+        }),
+        [editor]
+      );
 
-  useEffect(() => {
-    if (!editor) return;
+      useEffect(() => {
+        if (!editor) return;
 
-    const extensions: Extension[] = [];
-    if (lang !== 'text') {
-      const selectedLang = languages[lang];
-      extensions.push(selectedLang());
+        const extensions: Extension[] = [];
 
-      if (!readonly) {
-        extensions.push(basicSetup);
-      } else {
-        extensions.push(minimalSetup);
-        extensions.push(lineNumbers());
-      }
+        [
+          EditorView.editable.of(!readonly),
+          EditorState.readOnly.of(!!readonly),
+          placeholder(readonly ? '' : '> Start typing here...'),
+        ].forEach(ex => extensions.push(ex));
+
+        if (lang !== 'text') {
+          const selectedLang = languages[lang];
+          extensions.push(selectedLang());
+
+          if (!readonly) {
+            extensions.push(basicSetup);
+          } else {
+            extensions.push(minimalSetup);
+            extensions.push(lineNumbers());
+          }
+        }
+
+        if (!readonly) {
+          editor.focus();
+        }
+
+        if (readonly && provider) {
+          provider?.awareness.setLocalStateField('user', {
+            ...collaboration?.awareness,
+            color: 'transparent',
+          });
+        }
+
+        if (!readonly && provider) {
+          provider?.awareness.setLocalStateField(
+            'user',
+            collaboration?.awareness
+          );
+        }
+
+        editor.dispatch({
+          effects: extHolder.reconfigure(extensions),
+        });
+      }, [lang, editor, readonly]);
+
+      const editorContainer = useCallback((node: HTMLDivElement | null) => {
+        if (!node) return;
+
+        if (editor) {
+          editor.destroy();
+        }
+
+        const extensions = [
+          keymap.of([indentWithTab]),
+          oneDark,
+          extHolder.of([]),
+        ];
+
+        if (collaboration && !provider) {
+          const { doc, roomId } = collaboration;
+
+          const ytext = doc.getText('data');
+
+          const undoManager = new Y.UndoManager(ytext);
+
+          const host = window.location.host;
+
+          const socketProvider = new SocketIOProvider(
+            `ws://${host}`,
+            roomId,
+            doc,
+            { autoConnect: true }
+          );
+
+          socketProvider.awareness.setLocalStateField('user', {
+            name: 'Anonymous',
+            color,
+            ...collaboration.awareness,
+          });
+
+          socketProvider.socket.on('sync-step-1', () => {
+            collaboration.onConnected?.();
+          });
+
+          setProvider(socketProvider);
+
+          const ext = yCollab(ytext, socketProvider.awareness, {
+            undoManager,
+          });
+
+          extensions.push(ext);
+        }
+
+        const state = EditorState.create({
+          doc: initialState,
+          extensions,
+        });
+
+        const view = new EditorView({
+          state,
+          parent: node,
+        });
+
+        setEditor(view);
+      }, []);
+
+      return (
+        <>
+          <Box
+            sx={{ flex: '1 1 auto', m: 1 }}
+            component="div"
+            ref={editorContainer}
+          />
+        </>
+      );
     }
-
-    editor.dispatch({
-      effects: extHolder.reconfigure(extensions),
-    });
-  }, [lang, editor, readonly]);
-
-  useEffect(() => {
-    if (saveData && saveDataHandler) {
-      saveDataHandler(editor?.state.doc.toString());
-    }
-  }, [saveData, saveDataHandler]);
-
-  return (
-    <Box
-      sx={{ flex: '1 1 auto', p: 1 }}
-      component="div"
-      ref={editorContainer}
-    />
-  );
-};
+  )
+);

@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { mongoConnect } from '@/utils';
 import { Snippet } from '@/models';
-import { FilterQuery } from 'mongoose';
-import { ISnippet } from '@/schema';
 
 export async function GET(
   req: NextRequest,
@@ -31,7 +29,9 @@ export async function GET(
   try {
     await mongoConnect();
 
-    const snippets = await Snippet.find({ author: userId });
+    const snippets = await Snippet.find({
+      $or: [{ author: userId }, { collaborators: userId }],
+    });
 
     return NextResponse.json(
       {

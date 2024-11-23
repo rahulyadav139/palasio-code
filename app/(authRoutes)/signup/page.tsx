@@ -11,6 +11,7 @@ import { useError } from '@/hooks';
 interface IFormData {
   email: string;
   password: string;
+  name: string;
 }
 
 export default function Register() {
@@ -19,6 +20,7 @@ export default function Register() {
   const [formData, setFormData] = useState<IFormData>({
     email: '',
     password: '',
+    name: '',
   });
   const [isFormValid, setIsFormValid] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -27,7 +29,8 @@ export default function Register() {
 
     if (
       !regex.email.test(formData.email) ||
-      !regex.password.test(formData.password)
+      !regex.password.test(formData.password) ||
+      !formData.name.trim()
     ) {
       return setIsFormValid(false);
     } else setIsFormValid(true);
@@ -95,6 +98,19 @@ export default function Register() {
           mt: 5,
         }}
       >
+        <TextField
+          name="name"
+          onChange={inputHandler}
+          value={formData.name}
+          required
+          label="Name"
+          fullWidth
+          variant="standard"
+          error={!isFormValid && !formData.name.trim()}
+          helperText={
+            !isFormValid && !formData.name.trim() ? 'Incorrect email' : ''
+          }
+        />
         <TextField
           name="email"
           onChange={inputHandler}

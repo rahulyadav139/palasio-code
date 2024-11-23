@@ -39,7 +39,7 @@ export default function Register() {
         email: formData.email.toLowerCase(),
       });
 
-      const redirectTo = params.get('redirect') ?? '/home';
+      const redirectTo = params?.get('redirect') ?? '/home';
 
       router.replace(redirectTo);
     } catch (err) {

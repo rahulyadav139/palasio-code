@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Header, Loading } from '@/components';
+import { Loading } from '@/components';
 import { useUser, useError } from '@/hooks';
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
@@ -21,7 +21,7 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
         const status = getStatusCode(err);
         if (status === 401) {
           const params = new URLSearchParams();
-          params.append('redirect', path);
+          params.append('redirect', path!);
 
           const url = `/login?${params.toString()}`;
           router.push(url);
@@ -37,10 +37,5 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
   if (!user) {
     return <Loading />;
   }
-  return (
-    <>
-      <Header />
-      {children}
-    </>
-  );
+  return children;
 }

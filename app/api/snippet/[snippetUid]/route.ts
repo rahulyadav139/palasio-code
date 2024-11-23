@@ -1,24 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Snippet } from '@/models';
 import { mongoConnect } from '@/utils';
+import { FilterQuery } from 'mongoose';
+import { ISnippet } from '@/schema';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { snippetId: string } }
+  { params }: { params: { snippetUid: string } }
 ) {
-  if (req.method !== 'GET') {
-    return NextResponse.json(
-      {
-        success: false,
-        message: `${req.method} method is not allowed`,
-      },
-      { status: 405 }
-    );
-  }
+  const searchParams = req.nextUrl.searchParams;
+  const isCollaborative = searchParams.get('isCollaborative');
   try {
     await mongoConnect();
 
-    const snippet = await Snippet.findOne({ uid: params.snippetId });
+    const filter: FilterQuery<ISnippet> = {
+      uid: params.snippetUid,
+    };
+
+    if (isCollaborative) {
+      filter.isCollaborative = isCollaborative;
+    }
+
+    let query = Snippet.findOne(filter);
+
+    if (isCollaborative) {
+      query = query.populate({
+        path: 'collaborators',
+        select: {
+          name: 1,
+          email: 1,
+        },
+      });
+    }
+
+    const snippet = await query.exec();
 
     if (!snippet) {
       throw new Error('not found');
@@ -32,33 +47,32 @@ export async function GET(
   } catch (err) {
     console.log(err);
 
-    return NextResponse.json({
-      success: false,
-      message: 'internal server error',
-    });
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'internal server error',
+      },
+      {
+        status: 500,
+      }
+    );
   }
 }
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { snippetId: string } }
+  { params }: { params: { snippetUid: string } }
 ) {
-  if (req.method !== 'PATCH') {
-    return NextResponse.json(
-      {
-        success: false,
-        message: `${req.method} method is not allowed`,
-      },
-      { status: 405 }
-    );
-  }
   try {
     await mongoConnect();
 
     const payload = await req.json();
 
     await Snippet.findOneAndUpdate(
-      { uid: params.snippetId },
+      {
+        uid: params.snippetUid,
+      },
+
       {
         data: payload.data,
         name: payload.name,

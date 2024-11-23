@@ -23,7 +23,7 @@ const getData = async (host: string, id: string) => {
 
 interface ISnippetPage {
   params: {
-    snippetId: string;
+    snippetUid: string;
   };
 }
 
@@ -31,7 +31,7 @@ export default async function SnippetPage({ params }: ISnippetPage) {
   let initialData: ISnippet;
   const host = headers().get('host');
 
-  const id = params.snippetId;
+  const id = params.snippetUid;
 
   const { snippet, error } = await getData(host!, id);
 

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { email, password } = await req.json();
+    const { email, password, name } = await req.json();
 
     await mongoConnect();
 
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = new User({ email, salt, hash });
+    const user = new User({ email, salt, hash, name });
 
     await user.save();
 

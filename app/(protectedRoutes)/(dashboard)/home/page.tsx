@@ -1,4 +1,5 @@
-import { SavedSnippets, UserSnippets } from '@/components';
+import { UserSnippets } from '@/components';
+
 import { Box, Divider, Typography } from '@mui/material';
 
 export default function Home() {
@@ -7,6 +8,7 @@ export default function Home() {
       <Typography variant="body1" fontWeight="bold">
         Your Snippets
       </Typography>
+
       <Divider />
       <UserSnippets />
     </Box>
