@@ -158,7 +158,7 @@ export const Editor = memo(
           const host = window.location.host;
 
           const socketProvider = new SocketIOProvider(
-            `wss://${host}`,
+            `ws://https://palasio.in`,
             roomId,
             doc,
             { autoConnect: true }
