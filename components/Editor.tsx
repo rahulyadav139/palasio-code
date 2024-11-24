@@ -3,7 +3,6 @@
 import { Box } from '@mui/material';
 import React, {
   useState,
-  FC,
   useCallback,
   useEffect,
   useImperativeHandle,
