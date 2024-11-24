@@ -3,7 +3,6 @@ import { Server } from 'socket.io';
 import type { Server as HTTPServer } from 'http';
 import type { Socket as NetSocket } from 'net';
 import type { Server as IOServer } from 'socket.io';
-import jwt from 'jsonwebtoken';
 
 interface SocketServer extends HTTPServer {
   io?: IOServer | undefined;
@@ -30,28 +29,14 @@ export default function SocketHandler(
   } else {
     console.log('Socket is initializing');
     const io = new Server(res.socket.server, {
-      transports: ['websocket', 'polling'], // Allow both WebSocket and polling
+      transports: ['websocket', 'polling'],
       cors: {
-        origin: 'https://www.palasio.in', // Allow only your frontend URL
+        origin: '*',
         methods: ['GET', 'POST'],
-        allowedHeaders: ['my-custom-header'],
-        credentials: true,
       },
     });
 
     const ysocketio = new YSocketIO(io, {
-      authenticate: handshake => {
-        return true;
-        // const token = handshake.auth.token;
-
-        // try {
-        //   jwt.verify(token, process.env.JWT_SECRET!);
-        //   return true;
-        // } catch (err) {
-        //   return false;
-        // }
-      },
-
       gcEnabled: true,
     });
     ysocketio.initialize();

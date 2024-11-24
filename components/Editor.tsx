@@ -3,7 +3,6 @@
 import { Box } from '@mui/material';
 import React, {
   useState,
-  FC,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -155,10 +154,8 @@ export const Editor = memo(
 
           const undoManager = new Y.UndoManager(ytext);
 
-          const host = window.location.host;
-
           const socketProvider = new SocketIOProvider(
-            `wss://${host}`,
+            process.env.SOCKET_URL!,
             roomId,
             doc,
             { autoConnect: true }
