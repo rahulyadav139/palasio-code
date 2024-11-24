@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  env: {
+    SERVER_URL: process.env.SERVER_URL,
+    SOCKET_URL: process.env.SOCKET_URL,
+  },
   async redirects() {
     return [
       {

@@ -87,7 +87,7 @@ export default function Collaboration() {
         });
 
         setInitialData(data.snippet.data);
-        await axios.get('/api/socket');
+        await axios.get(process.env.SERVER_URL!);
       } catch (err) {
         errorHandler(err);
         setIsError(true);
